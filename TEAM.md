@@ -15,7 +15,7 @@
 | Connor Archibald | QA Engineer | Remote |  |
 | Glory Eyo | Delivery Manager | Remote | Yes |
 
-The **squad lead** runs the squad's setup before the day: agreeing the two roles and getting everyone into the Teams channel. They're the product owner unless the squad agrees otherwise.
+The **squad lead** runs the squad's setup before the day: agreeing the two roles and getting everyone into the Teams chat. They're the product owner unless the squad agrees otherwise.
 
 ## Roles
 
