@@ -43,6 +43,13 @@ ai_use_week_after:
     - Not yet tested with a screen reader.
 - 16:38 I tested the officer board with a screen reader, normally an accessibility specialist's job: it worked well. Long read-outs, but I think that's mainly because I don't use a screen reader every day, so I'm not used to it. (Before this, Claude had shortened each home's read-out from about 40 words to 8 to 20, and added "Back to the list of homes".)
 - 17:16 badge: Claude Master
+- 15:21 dead end: the first share stalled for minutes → git was quietly waiting for my SSH key's passphrase out of sight. Unlocking the key with ssh-add fixed it.
+- 16:02 surprise: checking the official GOV.UK bank holiday list found a 2026 World Cup bank holiday in Scotland that none of us would have guessed. Checking real sources beat assuming.
+- 16:06 prompt: "Yes, move the deadline maths into its own file and add a browser test page for it." → a test page with 26 checks (now 54). Claude broke the 10-day rule on purpose and 3 checks went red, so the tests really catch mistakes.
+- 16:26 I checked every page for accessibility (labels, contrast, keyboard, screen reader read-outs, phone width, zoom, tap sizes), normally an accessibility specialist's job: it found real problems the screen didn't show, like errors that weren't read out and a focus ring hidden by shadows, and fixed them.
+- 17:39 dead end: Claude made mistakes too: a phone-layout bug from its own clock label, a clashing name in the code that would have broken the board, a test with a miscounted date, and sharing once before reading a warning → each was caught by checking (looking at the page, the tests, or a second look), not by trusting it.
+- 17:46 prompt: "we need better reminders for the officers to contact the people that have not been in contact themselves how could we do that?" → three options to choose from, then a contact ladder for tenants who've gone quiet (letter, then phone call, then a door knock), with nudges on the board and the manager summary. It goes straight at the challenge's hardest problem: tenants who never get in touch.
+- 17:51 surprise: Claude checked every helpline number on the service's own website before putting it on the tenant page, and wouldn't make up a repairs number for a made-up landlord.
 
 ## At 19:00
 - What I worked on: <answers>
