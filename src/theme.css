@@ -261,6 +261,9 @@ label, legend { color: var(--text); }
   padding: 0.75rem 1rem;
 }
 .error-summary { border-radius: var(--radius-small); }
+/* No bullets: the taller tap areas on the links pushed the bullets to the bottom line. */
+.error-summary ul { list-style: none; padding-left: 0; margin: 0.5rem 0 0; }
+.error-summary li { margin: 0.15rem 0; }
 
 /* ---------- Letters, emails and details ---------- */
 summary { padding: 0.25rem 0; }
@@ -434,6 +437,34 @@ input[type="file"]::file-selector-button:hover { background: var(--brand-tint); 
 .tests .checks li { border-radius: var(--radius-small); box-shadow: var(--shadow); }
 .result-summary { border-radius: var(--radius-small); }
 
+/* ---------- "Need help?" contacts on the tenant pages ---------- */
+.help-contacts {
+  margin: 0 0 1.25rem;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+}
+.help-contacts summary {
+  padding: 0.85rem 1rem;
+  font-size: 1.05rem;
+  color: var(--brand-dark);
+  border-radius: var(--radius);
+}
+.help-contacts summary:hover { background: var(--brand-tint); }
+.help-contacts details[open] summary { border-bottom: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; }
+.help-contacts ul { list-style: none; margin: 0; padding: 0.5rem 1rem 0.85rem; }
+.help-contacts li { padding: 0.6rem 0; border-bottom: 1px solid var(--border); line-height: 1.4; }
+.help-contacts li:last-child { border-bottom: 0; }
+.help-contacts .contact-title { display: block; font-size: 0.95rem; color: var(--text-muted); }
+.help-contacts a, .help-contacts .contact-call { display: inline-block; padding: 0.2rem 0; font-weight: 700; font-size: 1.05rem; }
+.help-contacts .contact-hours { display: block; font-size: 0.9rem; color: var(--text-muted); }
+.help-contacts li.urgent { margin: 0.25rem -0.5rem; padding: 0.6rem 0.5rem; background: var(--high-bg); border-radius: var(--radius-small); border-bottom: 0; }
+.help-contacts li.urgent .contact-title { color: var(--high); font-weight: 600; }
+.help-contacts li.urgent a, .help-contacts li.urgent .contact-call { color: var(--high); }
+@media (min-width: 1000px) {
+  .tenant-side .help-contacts { margin: 1rem 0 0; }
+}
+
 /* ---------- Wide screens: use the space, keep lines readable ---------- */
 /* Each page's content width. The header and page links line up with it. */
 :root { --page-max: 90rem; }
@@ -478,20 +509,26 @@ body:has(.tests) { --page-max: 50rem; }
     align-items: start;
   }
   .tenant-page > * { grid-column: 2; }
-  .tenant-page > .tenant-nav {
+  /* The side column (menu and "Need help?") stays in view as the page scrolls. */
+  .tenant-page > .tenant-side {
     grid-column: 1;
     grid-row: 1 / span 40;
     position: sticky;
     top: 1.5rem;
+    max-height: calc(100vh - 3rem);
+    overflow-y: auto;
+    margin-top: 0.4rem;
+  }
+  .tenant-side > .tenant-nav {
     flex-direction: column;
     gap: 0.6rem;
-    margin: 0.4rem 0 0;
+    margin: 0;
     padding: 1rem;
     background: var(--brand-tint);
     border-radius: var(--radius);
   }
   /* Each link is its own roomy row: white, full width, with an arrow. */
-  .tenant-page > .tenant-nav a {
+  .tenant-side > .tenant-nav a {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -502,15 +539,15 @@ body:has(.tests) { --page-max: 50rem; }
     line-height: 1.3;
     box-shadow: 0 1px 2px rgba(70, 50, 20, 0.06);
   }
-  .tenant-page > .tenant-nav a::after {
+  .tenant-side > .tenant-nav a::after {
     content: "›";
     content: "›" / "";
     font-size: 1.4rem;
     line-height: 1;
   }
-  .tenant-page > .tenant-nav a:hover { background: var(--surface-warm); text-decoration: underline; }
-  .tenant-page > .tenant-nav a[aria-current="page"] { background: var(--brand); color: var(--brand-text); }
-  .tenant-page > .tenant-nav a:focus-visible { box-shadow: 0 0 0 5px var(--text); }
+  .tenant-side > .tenant-nav a:hover { background: var(--surface-warm); text-decoration: underline; }
+  .tenant-side > .tenant-nav a[aria-current="page"] { background: var(--brand); color: var(--brand-text); }
+  .tenant-side > .tenant-nav a:focus-visible { box-shadow: 0 0 0 5px var(--text); }
 }
 
 /* ---------- Motion ---------- */

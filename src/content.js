@@ -154,6 +154,20 @@ window.CONTENT = {
     navCheck: "Check on my report",
     navHelp: "Help and your rights",
 
+    // The "Need help?" panel under the side menu. Numbers checked on 22 October 2026 on each
+    // service's own website. The emergency repairs line is on the tenant's rent letter.
+    contactsHeading: "Need help?",
+    contactsSummary: "Need help? Phone numbers",
+    contacts: [
+      { title: "Someone is in danger or very ill", call: "Call 999", tel: "999", urgent: true },
+      { title: "A leak, or water coming through a ceiling", text: "Call the emergency repairs number on your rent letter", urgent: true },
+      { title: "Feeling unwell, and it's not an emergency", call: "NHS 24: call 111", tel: "111", hours: "Free, any time" },
+      { title: "Help with heating and energy bills", call: "Home Energy Scotland: 0808 808 2282", tel: "08088082282", hours: "Free. Monday to Friday 8am to 8pm, Saturday 9am to 5pm" },
+      { title: "Feeling low, or need to talk", call: "Samaritans: 116 123", tel: "116123", hours: "Free, any time" },
+      { title: "", call: "Breathing Space: 0800 83 85 87", tel: "0800838587", hours: "Free. Evenings and weekends" },
+      { title: "You might lose your home", call: "Shelter Scotland: 0808 800 4444", tel: "08088004444", hours: "Free. Monday to Friday 9am to 5pm" }
+    ],
+
     whoLegend: "Who's telling us?",
     whoOptions: { tenant: "I live there (I'm the tenant)", other: "I'm telling you about someone else's home" },
     whoNeeded: "Choose who's telling us.",
