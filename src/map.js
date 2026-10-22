@@ -63,6 +63,43 @@
     return '<rect class="mk mk-none" x="' + (x - 6) + '" y="' + (y - 6) + '" width="12" height="12"/>';
   }
 
+  // Where the main north to south roads run (see basemap), so houses aren't drawn on them.
+  const MAIN_ROADS_X = [140, 270, 400, 530, 660];
+
+  // The drawing under the homes: land, a river along the north, parks with trees, and the main
+  // roads joining the streets. It's a made-up neighbourhood, labelled as such, not a real place.
+  function basemap() {
+    const road = (d) => '<path class="map-road-edge main" d="' + d + '"/><path class="map-road main" d="' + d + '"/>';
+    const trees = (points) => points.map(([x, y]) => '<circle class="map-tree" cx="' + x + '" cy="' + y + '" r="7"/>').join("");
+    return '<g aria-hidden="true">' +
+      '<rect class="map-land" x="0" y="0" width="800" height="600"/>' +
+      // The river, with a riverside path.
+      '<path class="map-water" d="M0 0 H800 V22 C700 44 610 10 500 28 C390 46 300 12 190 30 C110 42 50 24 0 34 Z"/>' +
+      '<text class="map-water-name" x="640" y="20">River</text>' +
+      // Parks.
+      '<rect class="map-park" x="600" y="48" width="180" height="104" rx="18"/>' +
+      trees([[625, 75], [650, 95], [700, 70], [745, 90], [760, 130], [630, 130]]) +
+      '<text class="map-park-name" x="660" y="122">Riverside Park</text>' +
+      '<rect class="map-park" x="18" y="410" width="196" height="172" rx="18"/>' +
+      trees([[45, 440], [80, 470], [60, 545], [170, 440], [190, 520], [130, 560]]) +
+      '<text class="map-park-name" x="70" y="505">Green Park</text>' +
+      '<rect class="map-park" x="586" y="410" width="196" height="172" rx="18"/>' +
+      trees([[610, 440], [650, 470], [760, 445], [740, 545], [615, 555], [700, 500]]) +
+      '<text class="map-park-name" x="640" y="525">Playing Fields</text>' +
+      // Main roads joining the streets.
+      road("M0 170 C200 160 600 180 800 168") +
+      road("M400 100 V170") +
+      road("M270 170 V600") +
+      road("M530 172 V600") +
+      road("M140 170 V345") +
+      road("M660 168 V300") +
+      '<text class="map-main-road-name" x="20" y="162">High Road</text>' +
+      // A compass and an honest label.
+      '<g class="map-compass" transform="translate(40 80)"><circle r="18"/><path d="M0 -14 L6 4 L0 0 L-6 4 Z"/><text y="-22" text-anchor="middle">N</text></g>' +
+      '<text class="map-made-up" x="790" y="594" text-anchor="end">Made-up area. Not a real place.</text>' +
+      "</g>";
+  }
+
   function render() {
     const state = loadState();
     const rows = homes.map((home) => {
@@ -80,16 +117,30 @@
     rows.forEach((r) => (byStreet[r.street] = byStreet[r.street] || []).push(r));
     Object.values(byStreet).forEach((list) => list.sort((a, b) => a.number - b.number || a.home.id.localeCompare(b.home.id)));
 
-    let svg = '<svg viewBox="0 0 800 600" role="group" aria-label="' + M.alt + '" class="map-svg">';
+    let svg = '<svg viewBox="0 0 800 600" role="group" aria-label="' + M.alt + '" class="map-svg">' + basemap();
     Object.keys(AREAS).forEach((name) => {
       const a = AREAS[name];
-      svg += '<rect class="map-area" x="' + a.x + '" y="' + a.y + '" width="' + a.w + '" height="' + a.h + '" rx="14"/>' +
-        '<text class="map-area-name" x="' + (a.x + 14) + '" y="' + (a.y + 26) + '">' + name + "</text>";
+      // South's label sits a little higher, clear of the first row of houses.
+      svg += '<text class="map-area-name" x="' + (a.x + 14) + '" y="' + (a.y + (name === "South" ? 8 : 26)) + '">' + name + "</text>";
     });
     Object.keys(STREETS).forEach((name) => {
       const st = STREETS[name];
       const list = byStreet[name] || [];
-      svg += '<line class="map-street" x1="' + st.x1 + '" y1="' + st.y1 + '" x2="' + st.x2 + '" y2="' + st.y2 + '"/>' +
+      // Each street is drawn like a road on a map, with a row of houses along it.
+      // No houses where a main road crosses, and no row at all if it would cover the name of the
+      // street just above.
+      const crowded = Object.keys(STREETS).some((other) => {
+        const o = STREETS[other];
+        return other !== name && st.y1 - o.y1 > 0 && st.y1 - o.y1 < 70 && o.x1 < st.x2 && o.x2 > st.x1;
+      });
+      let houses = "";
+      for (let hx = st.x1 + 6; !crowded && hx < st.x2 - 14; hx += 24) {
+        if (MAIN_ROADS_X.some((rx) => hx < rx + 10 && hx + 18 > rx - 10)) continue;
+        houses += '<rect class="map-block" x="' + hx + '" y="' + (st.y1 - 42) + '" width="18" height="14" rx="2"/>';
+      }
+      svg += houses +
+        '<line class="map-road-edge" x1="' + st.x1 + '" y1="' + st.y1 + '" x2="' + st.x2 + '" y2="' + st.y2 + '"/>' +
+        '<line class="map-road" x1="' + st.x1 + '" y1="' + st.y1 + '" x2="' + st.x2 + '" y2="' + st.y2 + '"/>' +
         '<text class="map-street-name" x="' + st.x1 + '" y="' + (st.y1 + 34) + '">' + name + "</text>";
       list.forEach((r, i) => {
         const x = Math.round(st.x1 + (st.x2 - st.x1) * (i + 1) / (list.length + 1));
