@@ -262,3 +262,9 @@ input.short { max-width: 10rem; }
 .header-link { margin: 0.25rem 0 0; font-size: 0.9rem; }
 .header-link a { color: var(--brand-text); }
 .tenant-note { margin: 0.25rem 0; }
+.tenant-nav { display: flex; flex-wrap: wrap; gap: 0.25rem 1.25rem; margin-bottom: 1rem; }
+.tenant-nav a { color: var(--brand); font-weight: 600; padding: 0.25rem 0; }
+.tenant-nav a[aria-current="page"] { color: var(--text); text-decoration: none; border-bottom: 3px solid var(--brand); }
+.conditional { border-left: 4px solid var(--border); padding-left: 1rem; margin: 0.5rem 0 1rem; }
+.check.consent { background: var(--background); padding: 0.5rem; border-radius: var(--radius); }
+#check-result:focus { outline: none; }
