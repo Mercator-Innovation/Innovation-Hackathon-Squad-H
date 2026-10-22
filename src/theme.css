@@ -32,6 +32,9 @@
   --shadow-raised: 0 2px 4px rgba(70, 50, 20, 0.08), 0 10px 24px rgba(70, 50, 20, 0.1);
 }
 
+/* Keep room for the scrollbar on every page, so switching pages doesn't shift things sideways. */
+html { scrollbar-gutter: stable; }
+
 /* ---------- Type ---------- */
 body { font-size: 1.125rem; line-height: 1.6; }
 h1 { font-size: 2rem; letter-spacing: -0.01em; color: var(--brand-dark); }
@@ -79,6 +82,9 @@ a:hover { text-decoration-thickness: 3px; }
   color: var(--brand);
 }
 .page-nav a:hover { background: var(--brand-tint); }
+/* The link to the tenant's view sits at the end, marked as opening a new tab. */
+.page-nav .nav-external { margin-left: auto; }
+.page-nav .nav-external::after { content: "\00a0↗"; content: "\00a0↗" / ""; }
 .page-nav a[aria-current="page"] {
   background: var(--brand);
   color: var(--brand-text);
@@ -100,6 +106,18 @@ select, input[type="search"], input[type="text"], input[type="date"], textarea {
 }
 select:hover, input[type="search"]:hover, input[type="text"]:hover, input[type="date"]:hover, textarea:hover {
   border-color: var(--brand);
+}
+/* Dropdowns: the same height as the other fields, room for the text, and a clear arrow. */
+select, input[type="search"], input[type="text"], input[type="date"] { min-height: 3rem; line-height: 1.4; }
+select {
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 0.6rem 2.75rem 0.6rem 0.85rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 6l5 5 5-5' fill='none' stroke='%231f4d3a' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 1rem;
+  cursor: pointer;
 }
 input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
 .radio input, .check input { width: 1.4rem; height: 1.4rem; }
@@ -270,7 +288,7 @@ details.more > :last-child { margin-bottom: 1.25rem; }
 /* ---------- Wide screens: use the space, keep lines readable ---------- */
 /* Each page's content width. The header and page links line up with it. */
 :root { --page-max: 90rem; }
-body:has(.reminders) { --page-max: 80rem; }
+body:has(.reminders) { --page-max: 90rem; }
 body:has(.tenant-page) { --page-max: 66rem; }
 body:has(.tests) { --page-max: 50rem; }
 
