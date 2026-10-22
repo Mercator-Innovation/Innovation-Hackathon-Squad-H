@@ -4,4 +4,5 @@
 
 - Plain HTML, CSS and JavaScript that opens straight from the file: `open src/index.html` on a Mac, or double-click it. No build step and no installs, unless the squad decides otherwise.
 - Data goes in `data/` as `.js` files (`window.DATA = …`), because a page opened from a file can't load `.json`. **Synthetic or open data only.**
+- **Tests:** open `tests.html` (http://localhost:8766/tests.html) to check the Awaab's Law deadline maths in `clock.js`. Everything should be green. If you change `clock.js`, check it again.
 - The files are split so people can work at the same time: `index.html` (structure), `styles.css` (the look), `app.js` (behaviour), `content.js` (the words), `data/` (data), plus one file per extra screen.

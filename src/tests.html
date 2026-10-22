@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deadline checks (prototype tests)</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .tests { max-width: 800px; margin: 0 auto; padding: 1rem; }
+    .result-summary { font-size: 1.2rem; font-weight: 700; padding: 0.75rem 1rem; border-radius: var(--radius); }
+    .result-summary.all-pass { background: var(--good-bg); color: var(--good); border-left: 6px solid var(--good); }
+    .result-summary.some-fail { background: var(--high-bg); color: var(--high); border-left: 6px solid var(--high); }
+    .checks { list-style: none; padding: 0; }
+    .checks li { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.5rem 0.75rem; margin-bottom: 0.5rem; }
+    .pass { color: var(--good); font-weight: 700; }
+    .fail { color: var(--high); font-weight: 700; }
+    .detail { display: block; color: var(--text-muted); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <p class="service-name">Healthier homes board</p>
+    <p class="banner">Automated checks for the Awaab's Law deadline maths (clock.js).</p>
+  </header>
+
+  <main class="tests">
+    <h1>Deadline checks</h1>
+    <p class="intro">These run every time you open or refresh this page. "Today" is fixed at Thursday 22 October 2026, so the answers don't change from day to day. If one goes red, something in clock.js has broken.</p>
+    <p id="result" class="result-summary" role="status"></p>
+    <div id="groups"></div>
+    <p><a href="index.html">Back to the board</a></p>
+  </main>
+
+  <script src="data/bank-holidays.js"></script>
+  <script src="clock.js"></script>
+  <script>
+    (function () {
+      const { isWorkingDay, addWorkingDays, toISO, fromISO, workingDaysFromToday, newCase, awaabSteps } = window.Clock;
+      const today = fromISO("2026-10-22"); // a Thursday
+      const groups = [];
+      let current;
+
+      function group(name) {
+        current = { name, checks: [] };
+        groups.push(current);
+      }
+
+      // One check: a plain-English description, what we got, and what we expected.
+      function check(description, actual, expected) {
+        current.checks.push({ description, actual, expected, pass: actual === expected });
+      }
+
+      const plus = (date, n) => toISO(addWorkingDays(fromISO(date), n));
+      const left = (due) => workingDaysFromToday(fromISO(due), today);
+      const step = (c, key) => awaabSteps(c, today).find((s) => s.key === key);
+      const caseWith = (changes) => Object.assign(newCase(today), changes);
+
+      group("Counting working days");
+      check("1 working day after Friday 23 October is Monday 26 October (weekend skipped)", plus("2026-10-23", 1), "2026-10-26");
+      check("10 working days after Tuesday 24 November skips St Andrew's Day (Monday 30 November)", plus("2026-11-24", 10), "2026-12-09");
+      check("3 working days after Wednesday 23 December skips Christmas Day and the Boxing Day holiday", plus("2026-12-23", 3), "2026-12-30");
+      check("1 working day after Friday 12 June skips the World Cup bank holiday (Monday 15 June)", plus("2026-06-12", 1), "2026-06-16");
+      check("1 working day before Monday 26 October is Friday 23 October", plus("2026-10-26", -1), "2026-10-23");
+      check("Saturday 24 October isn't a working day", isWorkingDay(fromISO("2026-10-24")), false);
+      check("St Andrew's Day (Monday 30 November) isn't a working day", isWorkingDay(fromISO("2026-11-30")), false);
+      check("Thursday 22 October is a working day", isWorkingDay(fromISO("2026-10-22")), true);
+
+      group("Working days left");
+      check("Due today: 0 days left", left("2026-10-22"), 0);
+      check("Due Monday 26 October: 2 days left (weekend not counted)", left("2026-10-26"), 2);
+      check("Due yesterday: 1 day late", left("2026-10-21"), -1);
+      check("Due last Monday: 3 days late", left("2026-10-19"), -3);
+
+      group("The Awaab's Law steps");
+      const fresh = newCase(today);
+      check("A new case starts the clock today", fresh.aware, "2026-10-22");
+      check("Investigate within 10 working days: by Thursday 5 November", toISO(step(fresh, "investigate").due), "2026-11-05");
+      check("A new case has 10 working days left to investigate", step(fresh, "investigate").daysLeft, 10);
+      check("Before the investigation, the summary step isn't running", step(fresh, "summary").open, false);
+
+      const found = caseWith({ investigated: "2026-10-22", substantial: true });
+      check("Written summary within 3 working days of the investigation: by Tuesday 27 October", toISO(step(found, "summary").due), "2026-10-27");
+      check("Start repairs within 5 working days of the investigation: by Thursday 29 October", toISO(step(found, "start").due), "2026-10-29");
+      check("Finishing repairs doesn't start until repairs start", step(found, "finish").open, false);
+
+      const noDamp = caseWith({ investigated: "2026-10-22", substantial: false });
+      check("No substantial damp or mould: starting repairs isn't needed", step(noDamp, "start").notNeeded, true);
+      check("No substantial damp or mould: the summary is still needed", step(noDamp, "summary").open, true);
+
+      const started = caseWith({ investigated: "2026-10-15", substantial: true, summarySent: "2026-10-16", repairsStarted: "2026-10-22" });
+      check("Finish repairs within 20 working days of starting: by Thursday 19 November", toISO(step(started, "finish").due), "2026-11-19");
+
+      const late = caseWith({ aware: plus("2026-10-22", -13) });
+      check("Aware 13 working days ago and not investigated: 3 days late", step(late, "investigate").daysLeft, -3);
+
+      group("Delays");
+      const delayed = caseWith({ aware: plus("2026-10-22", -13), delays: { investigate: { reason: "No access", newDate: "2026-10-29", interim: ["Monitoring"] } } });
+      check("A delay moves the deadline to the new date", toISO(step(delayed, "investigate").due), "2026-10-29");
+      check("A late step with a new date is no longer late: 5 days left", step(delayed, "investigate").daysLeft, 5);
+      const delayedDone = caseWith({ investigated: "2026-10-22", delays: { investigate: { newDate: "2026-12-01" } } });
+      check("A delay on a step that's done doesn't reopen it", step(delayedDone, "investigate").open, false);
+
+      // Show the results.
+      const all = groups.flatMap((g) => g.checks);
+      const failed = all.filter((c) => !c.pass).length;
+      const result = document.getElementById("result");
+      result.textContent = failed
+        ? "✗ " + failed + " of " + all.length + " checks failed."
+        : "✓ All " + all.length + " checks passed.";
+      result.className = "result-summary " + (failed ? "some-fail" : "all-pass");
+
+      document.getElementById("groups").innerHTML = groups.map((g) => (
+        "<h2>" + g.name + "</h2><ul class=\"checks\">" + g.checks.map((c) => (
+          "<li>" + (c.pass ? '<span class="pass">✓ Pass</span> ' : '<span class="fail">✗ Fail</span> ') + c.description +
+          (c.pass ? "" : '<span class="detail">Expected ' + c.expected + ", got " + c.actual + "</span>") + "</li>"
+        )).join("") + "</ul>"
+      )).join("");
+    })();
+  </script>
+</body>
+</html>
