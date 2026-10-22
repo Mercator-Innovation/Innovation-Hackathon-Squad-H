@@ -40,6 +40,38 @@ window.CONTENT = {
     letter: { label: "Send the tick-box questionnaire", team: "Housing officer" }
   },
   awaabStarted: (date) => "Awaab's Law clock started. Investigate by " + date + " (10 working days).",
+  awaabAlreadyRunning: "The Awaab's Law clock is already running for this home.",
+
+  // The Awaab's Law clock. Timescales from our research note (sketches/research-awaabs-law-and-cloch.md).
+  awaab: {
+    heading: "Awaab's Law clock",
+    intro: "The clock started when we became aware of possible damp or mould. These are the legal deadlines, in working days.",
+    cardLabel: "Awaab's Law",
+    steps: {
+      investigate: { label: "Investigate", rule: "within 10 working days of becoming aware" },
+      summary: { label: "Send the tenant a written summary", rule: "within 3 working days of the investigation" },
+      start: { label: "Start repairs", rule: "within 5 working days of the investigation, if there's substantial damp or mould" },
+      finish: { label: "Finish repairs", rule: "within 20 working days of starting" }
+    },
+    aware: (date) => "Became aware on " + date + ".",
+    done: (date) => "Done " + date,
+    notNeeded: "Not needed: no substantial damp or mould found",
+    waiting: "Waits for the step before",
+    dueBy: (date) => "Due by " + date,
+    left: (n) => n === 0 ? "due today" : n + " working " + (n === 1 ? "day" : "days") + " left",
+    late: (n) => n + " working " + (n === 1 ? "day" : "days") + " late",
+    closed: "All steps done",
+    lateNote: "A deadline has been missed. Tell the tenant why and give a new date, and take steps to stop the damp or mould spreading. The tenant may be due compensation.",
+    markInvestigated: "Mark investigation done",
+    substantialLegend: "Did the investigation find substantial damp or mould?",
+    substantialYes: "Yes",
+    substantialNo: "No",
+    substantialNeeded: "Say whether substantial damp or mould was found.",
+    markSummary: "Mark summary sent",
+    markStarted: "Mark repairs started",
+    markFinished: "Mark repairs finished",
+    summaryCount: (running, late) => running + " Awaab's Law " + (running === 1 ? "clock" : "clocks") + " running, " + late + " late."
+  },
 
   letterPreviewSummary: "See the questionnaire the tenant gets",
   letterTitle: "How is your home?",
