@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mould Breakers: show and tell</title>
+  <style>
+    :root {
+      --font: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+      --cream: #faf7f2;
+      --text: #1f2a24;
+      --muted: #4b5850;
+      --green: #1f4d3a;
+      --green-dark: #163a2b;
+      --tint: #eaf3ee;
+      --yellow: #e9b949;
+      --red: #a4161a;
+      --red-bg: #fdecea;
+      --blue: #1d4f91;
+      --blue-bg: #e8f0fb;
+      --focus: #ffbf47;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: var(--font);
+      background: var(--cream);
+      color: var(--text);
+      overflow: hidden;
+    }
+    .deck { position: relative; height: 100vh; }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 4vh 8vw 12vh;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(6vw);
+      transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
+    }
+    .slide.is-current { opacity: 1; visibility: visible; transform: none; }
+    .slide.is-past { transform: translateX(-6vw); }
+    /* Each part of a slide arrives in turn. */
+    .slide .in { opacity: 0; transform: translateY(18px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .slide.is-current .in { opacity: 1; transform: none; }
+    .slide.is-current .in:nth-child(2) { transition-delay: 0.25s; }
+    .slide.is-current .in:nth-child(3) { transition-delay: 0.5s; }
+    .slide.is-current .in:nth-child(4) { transition-delay: 0.75s; }
+    .slide.is-current .in:nth-child(5) { transition-delay: 1s; }
+    .slide.is-current .in:nth-child(6) { transition-delay: 1.25s; }
+
+    .kicker { font-size: clamp(1rem, 1.6vw, 1.4rem); font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); margin: 0 0 1rem; }
+    h1, h2 { margin: 0 0 1.5rem; line-height: 1.1; color: var(--green-dark); }
+    h1 { font-size: clamp(2.6rem, 7vw, 6rem); }
+    h2 { font-size: clamp(2rem, 4.6vw, 4rem); }
+    p, li { font-size: clamp(1.15rem, 2.2vw, 2rem); line-height: 1.4; max-width: 46ch; }
+    .lead { color: var(--muted); }
+    ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 1rem; }
+    li { padding-left: 1.6em; position: relative; }
+    li::before { content: ""; position: absolute; left: 0; top: 0.45em; width: 0.7em; height: 0.7em; border-radius: 50%; background: var(--yellow); }
+
+    .title-slide { background: var(--green); color: #fff; }
+    .title-slide h1, .title-slide h2, .title-slide .kicker { color: #fff; }
+    .title-slide .kicker { color: var(--yellow); }
+    .title-slide p { color: #e8f1ec; }
+    .house { width: clamp(3rem, 7vw, 6rem); height: auto; margin-bottom: 1.5rem; }
+
+    .clock { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; }
+    .step { background: #fff; border: 2px solid var(--green); border-radius: 16px; padding: 0.8rem 1.1rem; font-size: clamp(1rem, 1.8vw, 1.6rem); }
+    .step b { display: block; font-size: 1.6em; color: var(--green-dark); }
+
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 3vw; align-items: start; }
+    .card { background: #fff; border-radius: 20px; padding: 1.5rem 1.75rem; box-shadow: 0 2px 4px rgba(70,50,20,.08), 0 10px 24px rgba(70,50,20,.1); }
+    .card h3 { margin: 0 0 0.75rem; font-size: clamp(1.3rem, 2.4vw, 2.2rem); color: var(--green-dark); }
+    .card li { font-size: clamp(1rem, 1.7vw, 1.5rem); }
+
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2vw; margin-top: 1rem; }
+    .stat { background: #fff; border-radius: 20px; padding: 1.5rem 1rem; text-align: center; box-shadow: 0 2px 4px rgba(70,50,20,.08), 0 10px 24px rgba(70,50,20,.1); }
+    .stat .n { display: block; font-size: clamp(2.6rem, 6vw, 5.5rem); font-weight: 800; color: var(--green); line-height: 1; }
+    .stat .l { display: block; margin-top: 0.5rem; font-size: clamp(1rem, 1.6vw, 1.4rem); color: var(--muted); }
+
+    .warn { background: var(--red-bg); border-left: 10px solid var(--red); border-radius: 16px; padding: 1.25rem 1.5rem; }
+    .warn p { color: var(--red); font-weight: 700; margin: 0; }
+    .good { background: var(--blue-bg); border-left: 10px solid var(--blue); border-radius: 16px; padding: 1.25rem 1.5rem; }
+    .quote { font-size: clamp(1.4rem, 3vw, 2.6rem); font-weight: 700; color: var(--green-dark); max-width: 30ch; }
+
+    /* Controls */
+    .controls { position: fixed; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 2vw; background: rgba(250, 247, 242, 0.96); border-top: 1px solid #e6dfd3; }
+    .controls button {
+      font: inherit; font-weight: 700; font-size: 1rem;
+      padding: 0.6rem 1.2rem; min-width: 6.5rem;
+      border-radius: 999px; border: 2px solid var(--green); background: #fff; color: var(--green); cursor: pointer;
+    }
+    .controls button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; box-shadow: 0 0 0 5px var(--text); }
+    .count { font-weight: 700; color: var(--muted); }
+    .progress { position: fixed; left: 0; top: 0; height: 6px; background: var(--yellow); transition: width 0.4s ease; }
+    .hint { position: fixed; right: 2vw; top: 1rem; font-size: 0.95rem; color: var(--muted); background: rgba(250, 247, 242, 0.96); padding: 0.25rem 0.6rem; border-radius: 999px; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+    @media (max-width: 760px) {
+      .two, .stats { grid-template-columns: 1fr 1fr; }
+      .slide { padding: 6vh 6vw 14vh; overflow-y: auto; justify-content: flex-start; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide, .slide .in, .progress { transition: none; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+  <p class="hint" aria-hidden="true">Click, or use the arrow keys</p>
+
+  <main class="deck" id="deck" aria-roledescription="slide show" aria-label="Mould Breakers show and tell">
+
+    <section class="slide title-slide" aria-roledescription="slide" aria-label="1: Mould Breakers">
+      <svg class="house in" viewBox="0 0 24 24" aria-hidden="true"><path fill="#e9b949" d="M12 3 2 11.5h3V21h5.5v-6h3v6H19v-9.5h3z"/></svg>
+      <p class="kicker in">Squad H · Challenge 1: Healthier homes</p>
+      <h1 class="in">Mould Breakers</h1>
+      <p class="in">Finding tenants at risk from damp and cold, before they get ill.</p>
+      <p class="in">Glory Eyo, delivery manager · Connor Archibald, QA engineer</p>
+    </section>
+
+    <section class="slide" aria-roledescription="slide" aria-label="2: The problem">
+      <p class="kicker in">Who it's for</p>
+      <h2 class="in">Cloch's housing officers, and the tenants they can't see</h2>
+      <p class="in lead">Most damp and mould is only found when a tenant reports it. The people most at risk are often the ones who never get in touch.</p>
+      <div class="clock in" aria-label="Awaab's Law deadlines">
+        <div class="step"><b>10</b>working days to investigate</div>
+        <div class="step"><b>3</b>to tell the tenant</div>
+        <div class="step"><b>5</b>to start repairs</div>
+        <div class="step"><b>20</b>to finish them</div>
+      </div>
+    </section>
+
+    <section class="slide" aria-roledescription="slide" aria-label="3: What we built">
+      <p class="kicker in">What we built</p>
+      <h2 class="in">One board for officers, one kind page for tenants</h2>
+      <div class="two in">
+        <div class="card">
+          <h3>Officers</h3>
+          <ul>
+            <li>Homes most at risk first, with the reasons in plain words. A person always decides</li>
+            <li>The Awaab's Law clock: bank holidays, delays, compensation</li>
+            <li>Reaching quiet tenants: letter, then call, then a door knock</li>
+            <li>Reminders, a manager summary, a map, cold snap alerts</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Tenants</h3>
+          <ul>
+            <li>"Damp and mould are not your fault"</li>
+            <li>A short, no-blame report that reaches the officer straight away</li>
+            <li>Check on my report, and know your rights</li>
+            <li>Help numbers, always in view</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" aria-roledescription="slide" aria-label="4: Built by two non-developers">
+      <p class="kicker in">Everyone builds</p>
+      <h2 class="in">Built by two people who aren't developers</h2>
+      <div class="stats in">
+        <div class="stat"><span class="n" data-count="50">50</span><span class="l">shares to the squad's copy</span></div>
+        <div class="stat"><span class="n" data-count="0">0</span><span class="l">clashes between us</span></div>
+        <div class="stat"><span class="n" data-count="54">54</span><span class="l">automated checks, all passing</span></div>
+        <div class="stat"><span class="n" data-count="6">6</span><span class="l">pages, all tested with a screen reader</span></div>
+      </div>
+      <p class="in lead">A delivery manager built the tenant side. A QA engineer built a legal deadline engine.</p>
+    </section>
+
+    <section class="slide" aria-roledescription="slide" aria-label="5: What didn't work">
+      <p class="kicker in">What didn't work</p>
+      <h2 class="in">It's a convincing demo, not a service</h2>
+      <div class="warn in"><p>The tenant and officer sides only link up in the same browser. There's no real back end yet.</p></div>
+      <p class="in lead">And Claude made mistakes too: a phone layout bug, a clash in the code, a miscounted test. Every one was caught by checking, never by trusting it.</p>
+    </section>
+
+    <section class="slide" aria-roledescription="slide" aria-label="6: The surprise">
+      <p class="kicker in">The surprise</p>
+      <h2 class="in">It pushed back like a careful colleague</h2>
+      <ul class="in">
+        <li>A neighbour can't agree to share a tenant's health details</li>
+        <li>No made-up homes on real people's houses</li>
+        <li>Found a 2026 World Cup bank holiday in the official list</li>
+        <li>Checked every helpline number before using it</li>
+      </ul>
+    </section>
+
+    <section class="slide title-slide" aria-roledescription="slide" aria-label="7: Next">
+      <p class="kicker in">What's next</p>
+      <h2 class="in">Test it with real officers and tenants</h2>
+      <p class="in">Real data with Cloch, sign-in and privacy for tenants, other languages and easy read.</p>
+      <p class="in">Thank you · Mould Breakers</p>
+    </section>
+
+  </main>
+
+  <div class="controls">
+    <button type="button" id="prev">‹ Back</button>
+    <span class="count" id="count" aria-live="polite"></span>
+    <button type="button" id="next">Next ›</button>
+  </div>
+
+  <script>
+    (function () {
+      const slides = [...document.querySelectorAll(".slide")];
+      const count = document.getElementById("count");
+      const progress = document.getElementById("progress");
+      let current = 0;
+
+      // Big numbers count up when their slide appears.
+      function countUp(slide) {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        slide.querySelectorAll("[data-count]").forEach((el) => {
+          const target = Number(el.dataset.count);
+          const start = performance.now();
+          const tick = (now) => {
+            const t = Math.min(1, (now - start) / 900);
+            el.textContent = Math.round(target * t);
+            if (t < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        });
+      }
+
+      function show(i) {
+        current = Math.max(0, Math.min(slides.length - 1, i));
+        slides.forEach((s, n) => {
+          s.classList.toggle("is-current", n === current);
+          s.classList.toggle("is-past", n < current);
+          s.setAttribute("aria-hidden", n === current ? "false" : "true");
+        });
+        count.textContent = (current + 1) + " of " + slides.length + ": " + slides[current].getAttribute("aria-label").replace(/^\d+: /, "");
+        progress.style.width = ((current + 1) / slides.length * 100) + "%";
+        document.getElementById("prev").disabled = current === 0;
+        document.getElementById("next").disabled = current === slides.length - 1;
+        countUp(slides[current]);
+      }
+
+      document.getElementById("next").addEventListener("click", () => show(current + 1));
+      document.getElementById("prev").addEventListener("click", () => show(current - 1));
+      // Clicking anywhere on the slide moves on, like a clicker.
+      document.getElementById("deck").addEventListener("click", () => show(current + 1));
+      document.addEventListener("keydown", (e) => {
+        if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key) && e.target.tagName !== "BUTTON") { e.preventDefault(); show(current + 1); }
+        if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); show(current - 1); }
+        if (e.key === "Home") show(0);
+        if (e.key === "End") show(slides.length - 1);
+        if (e.key === "f") document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+      });
+
+      show(0);
+    })();
+  </script>
+</body>
+</html>
