@@ -159,6 +159,34 @@ label, legend { color: var(--text); }
 .home-card.level-medium:hover { box-shadow: var(--shadow-raised), inset 6px 0 0 var(--medium); }
 .home-card.level-low:hover { box-shadow: var(--shadow-raised), inset 6px 0 0 var(--low); }
 .home-card.level-none:hover { box-shadow: var(--shadow-raised), inset 6px 0 0 var(--none); }
+/* Tenants who've gone quiet: a nudge above the list, a label on the card, and the contact ladder. */
+.quiet-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin: 0.75rem 0;
+  padding: 0.85rem 1rem;
+  background: var(--low-bg);
+  border-left: 6px solid var(--low);
+  border-radius: var(--radius-small);
+}
+.quiet-banner[hidden] { display: none; }
+.quiet-banner p { margin: 0; flex: 1 1 16rem; font-weight: 600; color: var(--low); }
+.badge.quiet { color: var(--low); background: var(--low-bg); white-space: normal; border-radius: var(--radius-small); }
+.badge.quiet.is-late { color: var(--high); background: var(--high-bg); }
+.quiet-box {
+  border: 2px solid var(--low);
+  border-radius: var(--radius);
+  background: linear-gradient(var(--low-bg), var(--surface) 4rem);
+  padding: 1rem 1.25rem;
+  margin: 0.75rem 0;
+}
+.detail-panel .quiet-box h3 { margin-top: 0; padding-top: 0; border-top: 0; }
+.quiet-box form { border-top: 1px solid var(--border); margin-top: 1rem; padding-top: 1rem; }
+.quiet-box .field { margin-bottom: 0.75rem; }
+
 /* A new report waiting for a check: amber, with "New report: check today" in words. */
 .badge.level-check { color: var(--medium); background: var(--medium-bg); }
 .home-card.level-check { box-shadow: var(--shadow), inset 6px 0 0 var(--medium); }
@@ -195,7 +223,7 @@ label, legend { color: var(--text); }
 .detail-panel h2 { font-size: 1.6rem; }
 /* Every section of a home's details starts with the same soft line and space, so the long
    panel is easy to scan. (This replaces the few dividers that were there before.) */
-.detail-panel h3:not(.clock h3) {
+.detail-panel h3:not(.clock h3):not(.quiet-box h3) {
   margin-top: 1.75rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border);

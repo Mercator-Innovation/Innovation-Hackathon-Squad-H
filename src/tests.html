@@ -34,6 +34,7 @@
 
   <script src="data/bank-holidays.js"></script>
   <script src="clock.js"></script>
+  <script src="quiet.js"></script>
   <script>
     (function () {
       const { isWorkingDay, addWorkingDays, toISO, fromISO, workingDaysFromToday, newCase, awaabSteps } = window.Clock;
@@ -119,6 +120,41 @@
       check("Undoing the investigation reopens it", step(undone, "investigate").open, true);
       check("Undoing the investigation forgets what it found", undone.substantial, null);
       check("Undoing doesn't change the original case", found.investigated, "2026-10-22");
+
+      group("Tenants who've gone quiet");
+      const Q = window.Quiet;
+      const home = (changes) => Object.assign({ id: "T-1", monthsSinceContact: 1, gasNoAccess: false }, changes);
+      const rounds = (n) => ({ rounds: Array.from({ length: n }, (_, i) => ({ date: "2026-0" + (i + 1) + "-01" })) });
+      check("In touch recently: not on the list", Q.check(home({}), {}, null, {}, today), null);
+      check("No contact for 6 months: on the list", !!Q.check(home({ monthsSinceContact: 6 }), {}, null, {}, today), true);
+      check("No contact for 5 months: not yet", Q.check(home({ monthsSinceContact: 5 }), {}, null, {}, today), null);
+      check("No access at the gas safety check: on the list", !!Q.check(home({ gasNoAccess: true }), {}, null, {}, today), true);
+      check("No reply to 2 monthly reminders: on the list", !!Q.check(home({}), {}, rounds(2), {}, today), true);
+      check("No reply to 1 monthly reminder: not yet", Q.check(home({}), {}, rounds(1), {}, today), null);
+      check("Opted out of reminders: those don't count", Q.check(home({}), {}, rounds(3), { "T-1": "none" }, today), null);
+      check("A reply in the last 6 months takes them off the list",
+        Q.check(home({ monthsSinceContact: 9 }), { replies: [{ date: "2026-09-01" }] }, null, {}, today), null);
+      check("Spoke to them today: off the list",
+        Q.check(home({ monthsSinceContact: 9 }), { contacts: [{ date: "2026-10-22", method: "call", result: "spoke" }] }, null, {}, today), null);
+
+      group("The contact ladder");
+      const quiet = home({ monthsSinceContact: 9 });
+      const first = Q.check(quiet, {}, null, {}, today);
+      check("First step: a letter or text", first.method, "letter");
+      check("The first step is due today", first.daysLeft, 0);
+      const afterLetter = Q.check(quiet, { contacts: [{ date: "2026-10-22", method: "letter", result: "noAnswer" }] }, null, {}, today);
+      check("No answer to the letter: next is a phone call", afterLetter.method, "call");
+      check("The call is due 10 working days after the letter: Thursday 5 November", toISO(afterLetter.due), "2026-11-05");
+      const afterCall = Q.check(quiet, { contacts: [
+        { date: "2026-10-01", method: "letter", result: "noAnswer" },
+        { date: "2026-10-15", method: "call", result: "noAnswer" }] }, null, {}, today);
+      check("No answer to the call: next is a door knock", afterCall.method, "visit");
+      check("The door knock is due 5 working days after the call (Thursday 15 October): today", afterCall.daysLeft, 0);
+      const afterVisit = Q.check(quiet, { contacts: [
+        { date: "2026-10-01", method: "letter", result: "noAnswer" },
+        { date: "2026-10-08", method: "call", result: "noAnswer" },
+        { date: "2026-10-15", method: "visit", result: "leftMessage" }] }, null, {}, today);
+      check("Three tries with no answer: talk to a manager", afterVisit.escalate, true);
 
       // Show the results.
       const all = groups.flatMap((g) => g.checks);

@@ -335,6 +335,37 @@ window.CONTENT = {
   reportVisitNeeds: "Before visiting: ",
   reportPhotoAlt: "Photo of the damp or mould, sent with the report",
 
+  // Tenants who've gone quiet, and the contact ladder (rules in quiet.js).
+  quiet: {
+    banner: (n) => n + (n === 1 ? " tenant hasn't" : " tenants haven't") + " been in touch for a while. Reaching them early stops small problems turning into harm.",
+    bannerButton: "Show who to contact",
+    card: (method, when) => "Check-in due: " + method.toLowerCase() + ", " + when,
+    summaryCount: (n) => n + " gone quiet.",
+    tile: "Gone quiet: check-in due",
+    heading: "Getting in touch",
+    intro: "This tenant has gone quiet. Work up the steps until you reach them. Keep it friendly: it's a check-in, not a complaint.",
+    whyHeading: "Why they're on the check-in list",
+    reasons: {
+      months: (n) => "No contact for " + n + " months",
+      gas: "No access at the last gas safety check",
+      reminders: (n) => "No reply to " + n + " monthly reminders"
+    },
+    methods: { letter: "Send a letter or text", call: "Phone call", visit: "Door knock from the community support team" },
+    results: { spoke: "Spoke to them", noAnswer: "No answer", leftMessage: "Left a message or card" },
+    tried: (date, result) => "Tried " + date + ": " + result.toLowerCase(),
+    nextLabel: "Next",
+    dueNow: "now",
+    dueOn: (date) => "by " + date,
+    escalate: "Three tries and no answer yet. Talk to your manager about what to do next, and keep trying.",
+    methodLabel: "How you tried",
+    resultLegend: "How did it go?",
+    noteLabel: "Note (optional)",
+    noteHint: "For example: neighbour says they're away until Friday.",
+    logButton: "Log this try",
+    resultNeeded: "Say how it went.",
+    logged: (method, result) => method + ": " + result.toLowerCase()
+  },
+
   dismissHeading: "Not needed?",
   dismissLabel: "Why isn't this needed?",
   dismissHint: "For example: we're already in touch, or the tenant has moved.",

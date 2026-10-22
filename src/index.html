@@ -38,6 +38,7 @@
             <option value="low">Low</option>
             <option value="none">No signs</option>
             <option value="awaab">Awaab's Law clock running</option>
+            <option value="quiet">Gone quiet: check-in due</option>
             <option value="dismissed">Dismissed</option>
           </select>
         </div>
@@ -61,6 +62,7 @@
         </div>
       </div>
 
+      <div id="quiet-banner" class="quiet-banner" hidden><p id="quiet-banner-text"></p><button type="button" class="button secondary" id="quiet-banner-button">Show who to contact</button></div>
       <p id="summary" class="summary" aria-live="polite"></p>
       <ul id="home-list" class="home-list" tabindex="-1" aria-labelledby="list-heading"></ul>
     </section>
@@ -72,7 +74,9 @@
   <script src="data/homes.js"></script>
   <script src="data/awaab-cases.js"></script>
   <script src="data/bank-holidays.js"></script>
+  <script src="data/contact-preferences.js"></script>
   <script src="clock.js"></script>
+  <script src="quiet.js"></script>
   <script src="content.js"></script>
   <script src="risk.js"></script>
   <script src="app.js"></script>

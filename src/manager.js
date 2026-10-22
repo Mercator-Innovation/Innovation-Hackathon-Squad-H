@@ -40,6 +40,15 @@
     return state;
   }
 
+  // The monthly reminders sent, so tenants who don't reply count as gone quiet.
+  function remindersState() {
+    try {
+      return JSON.parse(localStorage.getItem("healthier-homes-reminders")) || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   function render() {
     const state = loadState();
     const rows = homes.map((home) => {
@@ -51,7 +60,8 @@
         risk: window.Risk.assess(home, s),
         waiting: (s.replies || []).some((r) => !r.checked),
         running: open.length > 0,
-        late: open.some((step) => step.daysLeft < 0)
+        late: open.some((step) => step.daysLeft < 0),
+        quiet: !!window.Quiet.check(home, s, remindersState(), window.DATA.contactPreferences, window.Clock.startOfToday())
       };
     });
     const live = rows.filter((r) => !r.s.dismissed);
@@ -64,6 +74,7 @@
       tile(count(live, (r) => r.risk.level === "medium"), M.levels.medium, "tone-medium") +
       tile(count(live, (r) => r.risk.level === "low"), M.levels.low, "tone-low") +
       tile(count(rows, (r) => r.waiting), M.waiting, "tone-check") +
+      tile(count(live, (r) => r.quiet), C.quiet.tile, "tone-low") +
       tile(count(rows, (r) => r.running), M.running) +
       tile(count(rows, (r) => r.late), M.late, count(rows, (r) => r.late) ? "tone-high" : "") +
       tile(count(rows, (r) => r.s.dismissed), M.dismissed);
