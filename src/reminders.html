@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Monthly reminders (prototype)</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="reminders.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to the main content</a>
+
+  <header class="site-header">
+    <p class="service-name">Healthier homes board</p>
+    <p class="banner">Prototype with made-up homes. Not a real service and no real tenants.</p>
+  </header>
+
+  <nav class="page-nav" aria-label="Pages">
+    <a href="index.html">Homes to help first</a>
+    <a href="reminders.html" aria-current="page">Monthly reminders</a>
+  </nav>
+
+  <main id="main" class="reminders">
+    <h1 id="heading"></h1>
+    <p id="intro" class="intro"></p>
+    <p id="prototype-note" class="note"></p>
+
+    <section aria-labelledby="settings-heading">
+      <h2 id="settings-heading"></h2>
+      <div class="field narrow">
+        <label for="frequency" id="frequency-label"></label>
+        <select id="frequency"></select>
+      </div>
+      <p id="send-day" class="note"></p>
+      <p id="next-send" class="next-send"></p>
+    </section>
+
+    <section aria-labelledby="who-heading">
+      <h2 id="who-heading"></h2>
+      <ul id="counts" class="counts"></ul>
+      <details>
+        <summary id="table-summary"></summary>
+        <div class="table-wrap">
+          <table>
+            <caption id="table-caption" class="visually-hidden"></caption>
+            <thead><tr><th scope="col" id="col-home"></th><th scope="col" id="col-how"></th><th scope="col" id="col-last"></th></tr></thead>
+            <tbody id="homes-table"></tbody>
+          </table>
+        </div>
+      </details>
+    </section>
+
+    <section aria-labelledby="preview-heading">
+      <h2 id="preview-heading"></h2>
+      <div class="previews">
+        <div class="preview">
+          <h3 id="email-tab"></h3>
+          <div class="email" id="email-preview"></div>
+        </div>
+        <div class="preview">
+          <h3 id="letter-tab"></h3>
+          <div class="letter" id="letter-preview"></div>
+        </div>
+      </div>
+      <p id="replies-note" class="note"></p>
+    </section>
+
+    <section aria-labelledby="send-heading">
+      <h2 id="send-heading"></h2>
+      <button type="button" class="button" id="send-button"></button>
+      <div id="send-result" role="status"></div>
+      <h3 id="history-heading"></h3>
+      <ul id="history" class="history"></ul>
+    </section>
+
+    <p><a href="index.html" id="back-link"></a></p>
+  </main>
+
+  <script src="data/homes.js"></script>
+  <script src="data/bank-holidays.js"></script>
+  <script src="data/contact-preferences.js"></script>
+  <script src="clock.js"></script>
+  <script src="content.js"></script>
+  <script src="reminders-content.js"></script>
+  <script src="reminders.js"></script>
+</body>
+</html>
