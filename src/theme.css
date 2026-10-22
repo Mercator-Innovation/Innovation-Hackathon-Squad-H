@@ -277,16 +277,52 @@ details.more {
   border-radius: var(--radius);
   background: var(--surface-warm);
 }
+/* The spacing sits on the box itself, so nothing inside touches its edges. */
+details.more { padding: 0 1.5rem; }
+details.more[open] { padding-bottom: 1.5rem; }
 details.more > summary {
-  padding: 1rem 1.25rem;
+  margin: 0 -1.5rem;
+  padding: 1rem 1.5rem;
   font-size: 1.1rem;
   line-height: 1.4;
   border-radius: var(--radius);
 }
 details.more > summary:hover { background: var(--brand-tint); }
 details.more[open] > summary { border-bottom: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; }
-details.more > :not(summary) { margin-left: 1.25rem; margin-right: 1.25rem; }
-details.more > :last-child { margin-bottom: 1.25rem; }
+details.more > p.note { margin: 1rem 0 0; }
+/* Each question gets its own space, with a soft line between them. */
+.tenant-page details.more > .field,
+.tenant-page details.more > fieldset {
+  margin: 0;
+  padding: 1.5rem 0 0;
+}
+.tenant-page details.more > .field + .field,
+.tenant-page details.more > .field + fieldset,
+.tenant-page details.more > fieldset + fieldset,
+.tenant-page details.more > fieldset + .field {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+/* Browsers draw a question group's heading on its top border; floating it keeps the line above it. */
+.tenant-page details.more legend { float: left; width: 100%; padding: 0; margin-bottom: 0.25rem; }
+.tenant-page details.more legend + * { clear: both; }
+.tenant-page details.more .note { margin-bottom: 0.5rem; }
+.tenant-page details.more .check.consent { margin-top: 1rem; }
+
+/* The photo button matches the other buttons instead of the browser's plain one. */
+input[type="file"] { font: inherit; max-width: 100%; }
+input[type="file"]::file-selector-button {
+  font: inherit;
+  font-weight: 700;
+  margin-right: 0.85rem;
+  padding: 0.55rem 1.2rem;
+  border: 2px solid var(--brand);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--brand);
+  cursor: pointer;
+}
+input[type="file"]::file-selector-button:hover { background: var(--brand-tint); }
 .check.consent { background: var(--brand-tint); border-radius: var(--radius-small); padding: 0.75rem; }
 .tenant-nav a { text-decoration: none; padding: 0.35rem 0.9rem; border-radius: 999px; }
 .tenant-nav a:hover { background: var(--brand-tint); }
