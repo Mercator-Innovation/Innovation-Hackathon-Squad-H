@@ -231,6 +231,8 @@ window.CONTENT = {
   dismissNeeded: "Say why it isn't needed.",
   dismissed: (reason) => "Dismissed: " + reason,
   undoDismiss: "Undo dismiss",
+  dismissBlocked: "You can't dismiss this home while its Awaab's Law clock is running. The legal deadlines still apply. Finish the steps, or record a delay.",
+  dismissUndoneByClock: "Back on the list: an Awaab's Law clock started",
 
   historyHeading: "What's been done",
   noHistory: "Nothing yet.",
