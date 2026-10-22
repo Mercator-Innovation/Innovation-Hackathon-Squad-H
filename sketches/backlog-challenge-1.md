@@ -43,6 +43,13 @@ Drafted by Glory Eyo (product owner) with Claude, 22 October 2026. **A draft for
 - **Sensors in every home.** Too costly, as the challenge says.
 - **A complex prediction model.** Simple, explainable rules are enough to show the idea.
 
+## Decisions (22 October, Glory and Connor)
+
+- **Challenge 1, for the housing officer first.** See the idea in `TEAM.md` and [Connor's solution summary](solution-summary-challenge-1.md).
+- **Keep "dismiss a flag with a reason" (M5).** The officer can dismiss a flag but must say why, such as "already in touch". It keeps a person in control and leaves a record.
+- **Questionnaire replies feed back into the board, but an officer checks first.** Replies show on the board, and an officer confirms before the flag changes.
+  - **Watch out:** under Awaab's Law, the clock starts when the landlord *becomes aware* of damp or mould. A reply that mentions damp probably counts as becoming aware, so the clock should start when the reply arrives, not when the officer checks it. The check decides what to do next, not when the clock starts. (Our reading of the guidance, not legal advice.)
+
 ## Questions for the squad
 
 - Is the housing officer the right person to start with, or the tenant?
