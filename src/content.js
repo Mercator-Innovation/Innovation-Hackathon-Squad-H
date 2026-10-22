@@ -25,13 +25,13 @@ window.CONTENT = {
   notesNotUsed: (n) => n + (n === 1 ? " support note isn't" : " support notes aren't") + " used, because the tenant hasn't agreed.",
 
   actionHeading: "Choose what to do",
-  actionLegend: "Action",
+  actionLegend: "Actions (choose one or more)",
   urgencyLabel: "How urgent",
   urgencies: ["Today", "This week", "This month"],
   confirmCheck: "I've checked the reasons and I'm making this decision.",
-  confirmButton: "Book this action",
+  confirmButton: "Book",
   confirmNeeded: "Tick the box to say you've checked the reasons.",
-  chooseAction: "Choose an action first.",
+  chooseAction: "Choose at least one action.",
 
   actions: {
     energy: { label: "Book an energy advice visit", team: "Energy advice service" },
@@ -115,6 +115,21 @@ window.CONTENT = {
     "I'd like someone to call me"
   ],
   letterEnd: "Send it back in the free envelope, or tell us by phone or text.",
+  // How much each ticked answer adds to the home's risk, in the same order as letterItems.
+  letterPoints: [2, 2, 2, 1, 1, 1],
+
+  replyHeading: "The tenant's reply",
+  replyIntro: "Record what the tenant ticked, whether it came by post, phone or text.",
+  replyLegend: "What the tenant ticked",
+  replyButton: "Record reply",
+  replyNeeded: "Tick at least one answer.",
+  replyReceived: (date) => "Reply received " + date,
+  replyToCheck: "Reply to check",
+  replyCheckButton: "I've checked this reply",
+  replyChecked: "Checked. It now counts towards this home's risk.",
+  replyHistory: "Reply received",
+  replyCheckedHistory: "Reply checked",
+  replyDampStarted: (date) => "The tenant mentioned damp or mould, so the Awaab's Law clock started today. Investigate by " + date + " (10 working days).",
 
   dismissHeading: "Not needed?",
   dismissLabel: "Why you're dismissing this flag",
@@ -138,6 +153,7 @@ window.CONTENT = {
     gasNoAccess: "No access at the last gas safety check",
     quiet: (m) => "No contact for " + m + " months",
     supportNote: (note) => "Support note (shared with consent): " + note,
+    reply: (item) => "Tenant's reply: " + item,
     olderPlus: "Tenant aged 75 or over, as well as other signs",
     olderCheckIn: "Tenant aged 75 or over: regular check-in due"
   }

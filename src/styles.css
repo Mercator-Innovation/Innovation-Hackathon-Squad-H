@@ -144,6 +144,7 @@ select, input[type="search"], textarea {
 .badge.level-low { color: var(--low); background: var(--low-bg); }
 .badge.level-none { color: var(--none); background: var(--none-bg); }
 .badge.status { color: var(--good); background: var(--good-bg); margin-left: 0.25rem; }
+.badge.reply { color: var(--medium); background: var(--medium-bg); margin-left: 0.25rem; }
 
 .detail-panel {
   background: var(--surface);
@@ -197,6 +198,7 @@ summary { cursor: pointer; color: var(--brand); font-weight: 600; }
 }
 .letter ul { list-style: none; padding: 0; }
 .letter li::before { content: "☐ "; }
+.letter.reply-received li::before { content: "☑ "; }
 
 .history { padding-left: 1.25rem; }
 
