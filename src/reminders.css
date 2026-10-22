@@ -1,0 +1,52 @@
+/* The monthly reminders page, and the page links shared with the board. */
+.page-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.page-nav a { color: var(--brand); font-weight: 600; padding: 0.25rem 0; }
+.page-nav a[aria-current="page"] { color: var(--text); text-decoration: none; border-bottom: 3px solid var(--brand); }
+
+.reminders { max-width: 960px; margin: 0 auto; padding: 1rem; }
+.reminders section { margin-top: 1.5rem; }
+.field.narrow { max-width: 20rem; }
+.next-send { font-weight: 700; font-size: 1.1rem; }
+.counts { padding-left: 1.25rem; }
+
+.table-wrap { overflow-x: auto; margin-top: 0.5rem; }
+table { border-collapse: collapse; width: 100%; background: var(--surface); }
+th, td { text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.channel { font-weight: 600; }
+.channel-none { color: var(--text-muted); }
+
+.previews { display: grid; gap: 1rem; }
+@media (min-width: 760px) { .previews { grid-template-columns: 1fr 1fr; } }
+.preview h3 { margin-top: 0; }
+.email {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+}
+.email-subject { border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+.email-button {
+  display: inline-block;
+  background: var(--brand);
+  color: var(--brand-text);
+  font-weight: 700;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
