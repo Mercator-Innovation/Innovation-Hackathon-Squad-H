@@ -54,6 +54,7 @@ ai_use_week_after:
 - 18:10 Working as a squad of two: about 50 shares between us (31 mine, 19 Glory's) with no clashes at all. What made it easy: a clear split (me on the officer pages, Glory on the tenant pages), small shares every few minutes, new things in their own files, and "get the latest" before starting anything.
 - 18:06 Claude pushed back twice, and it was right to: it suggested an illustrated map instead of a real one, because made-up homes would have sat on real people's houses; and it wouldn't fake a third person's shares to earn the Tag team badge, suggesting we ask a facilitator instead.
 - 18:10 dead end: tooling hiccups. Browsers kept showing old versions until a hard refresh (Cmd+Shift+R), the local preview server sometimes dropped files when pages reloaded quickly, and twice a quick script gave a false alarm that looking at the page cleared up.
+- 18:20 I also tested the other pages (reminders, manager summary, map, tenant pages and test page) with a screen reader, not just the officer board.
 - 18:10 About the hackathon itself: the Tag team badge (three people sharing within 15 minutes) can't be earned by a squad of two. Worth changing for next time.
 
 ## At 19:00
