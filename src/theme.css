@@ -193,6 +193,14 @@ label, legend { color: var(--text); }
   box-shadow: var(--shadow);
 }
 .detail-panel h2 { font-size: 1.6rem; }
+/* Every section of a home's details starts with the same soft line and space, so the long
+   panel is easy to scan. (This replaces the few dividers that were there before.) */
+.detail-panel h3:not(.clock h3) {
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.detail-panel .divider { display: none; }
 .back-link { font-size: 1rem; }
 .divider { border-top-color: var(--border); margin: 1.5rem 0; }
 .facts { gap: 0.35rem 1.25rem; }
@@ -256,6 +264,59 @@ summary { padding: 0.25rem 0; }
 .table-wrap { border: 1px solid var(--border); border-radius: var(--radius-small); }
 th { background: var(--surface-warm); }
 
+/* ---------- Manager summary ---------- */
+/* Same width and edges as the other officer pages, so nothing jumps when switching tabs. */
+.manager { max-width: var(--page-max); margin: 0 auto; padding: 1.5rem 1.25rem; }
+.manager > p { max-width: 70ch; }
+.manager section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow);
+  margin-top: 1.5rem;
+}
+.manager section h2 { margin-top: 0; }
+.manager section > p { max-width: 70ch; }
+.tiles { gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); }
+.tile { box-shadow: var(--shadow); padding: 1rem 1.25rem; }
+.tile-n { margin-bottom: 0.25rem; color: var(--brand-dark); }
+.manager .table-wrap, .manager table { border-radius: var(--radius-small); }
+.manager th { background: var(--surface-warm); }
+.figures li { margin-bottom: 0.35rem; }
+/* Phones: more room for the tables. Less padding, slightly smaller table text, and dates and
+   "days left" kept on one line. If a table is still too wide, it scrolls sideways in its box. */
+@media (max-width: 600px) {
+  .manager { padding-left: 1rem; padding-right: 1rem; }
+  .manager section { padding: 1rem 0.85rem; }
+  .manager table { font-size: 0.95rem; }
+  .manager th, .manager td { padding: 0.4rem 0.45rem; }
+}
+/* Phones: each table row becomes a small card, with the column name beside each value.
+   The labels come from responsive-tables.js and aren't read twice by screen readers. */
+@media (max-width: 600px) {
+  table.stack-on-phone, table.stack-on-phone tbody, table.stack-on-phone tr,
+  table.stack-on-phone td, table.stack-on-phone tbody th { display: block; width: 100%; }
+  table.stack-on-phone thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  table.stack-on-phone tr { padding: 0.75rem 0.85rem; border-bottom: 1px solid var(--border); }
+  table.stack-on-phone tr:last-child { border-bottom: 0; }
+  table.stack-on-phone td, table.stack-on-phone tbody th {
+    padding: 0.2rem 0;
+    border: 0;
+    text-align: right;
+  }
+  table.stack-on-phone td::before, table.stack-on-phone tbody th::before {
+    content: attr(data-label);
+    content: attr(data-label) / "";
+    float: left;
+    margin-right: 1rem;
+    font-weight: 600;
+    text-align: left;
+    color: var(--text-muted);
+  }
+  .manager .table-wrap { overflow: visible; }
+}
+
 /* ---------- The tenant's page ---------- */
 .tenant-page { padding: 1.5rem 1.25rem; }
 @media (min-width: 700px) {
@@ -270,6 +331,19 @@ th { background: var(--surface-warm); }
   }
 }
 .conditional { border-left-color: var(--accent); border-left-width: 5px; }
+/* The emergency line is the most important safety message, so it stands out. */
+.tenant-page .emergency {
+  margin: 1.5rem 0;
+  padding: 0.85rem 1rem 0.85rem 1.1rem;
+  background: var(--medium-bg);
+  border-left: 6px solid var(--medium);
+  border-radius: var(--radius-small);
+  font-weight: 600;
+}
+/* Space between the Check button and the answer, and around the links on the "what's next" page. */
+#check-result:not(:empty) { margin-top: 1.75rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+.tenant-page main > p > a:only-child, .tenant-page > p > a:only-child { margin: 0.25rem 0; }
+.tenant-page > p { margin: 0.75rem 0; }
 /* The optional questions on the tenant form: a clear box that opens when tapped. */
 details.more {
   margin: 1.5rem 0;

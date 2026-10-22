@@ -153,7 +153,7 @@
           '<input type="text" id="needs-note" aria-describedby="needs-note-hint">' +
         "</div>" +
         "</details>" +
-        '<p class="note">' + T.emergency + "</p>" +
+        '<p class="emergency">' + T.emergency + "</p>" +
         '<button type="submit" class="button">' + T.sendButton + "</button>" +
       "</form>";
 
@@ -304,7 +304,7 @@
       "<ol>" + next.map((n) => "<li>" + n + "</li>").join("") + "</ol>" +
       (other ? "" : '<p><a href="#check">' + T.nextCheck(ref) + "</a></p>") +
       '<p><a href="#help">' + T.helpLink + "</a></p>" +
-      '<p class="note">' + T.emergency + "</p>" +
+      '<p class="emergency">' + T.emergency + "</p>" +
       '<p><a href="#report" id="again">' + T.again + "</a></p>";
     document.getElementById("page-heading").focus();
   }
@@ -391,7 +391,7 @@
       "<h2>" + T.complainHeading + "</h2>" + list("ol", T.complainSteps) +
       "<p>" + T.complainTip + "</p>" +
       '<p class="note">' + T.moreHelp + "</p>" +
-      '<p class="note">' + T.emergency + "</p>";
+      '<p class="emergency">' + T.emergency + "</p>";
   }
 
   // ---------- Start ----------
