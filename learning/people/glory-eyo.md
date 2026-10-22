@@ -8,6 +8,7 @@ location: remote
 ai_use_before: 2
 hopes: [see-claude]
 feeling: excited
+badges: [claude-master]
 # At 19:00
 worked_on: []
 outside_usual_job:
@@ -35,6 +36,7 @@ ai_use_week_after:
 <!-- Claude adds one line per moment: prompts that worked (word for word), dead ends, surprises, things done outside my usual job, what made working as a squad easier or harder -->
 - 15:03 I researched Awaab's Law and what Cloch says, and drafted a MoSCoW backlog for Challenge 1, normally a researcher's and a BA's job: the early research made the challenge more interesting before we'd even chosen it.
 - 16:16 I tested the board as a housing officer and then built two features from what I found (booking several actions at once, and recording questionnaire replies that start the Awaab's Law clock), normally a tester's and a developer's job: four short tasks were enough to find the gaps, and both features were in the shared version within minutes.
+- 17:12 badge: Claude Master
 
 ## At 19:00
 - What I worked on: <answers>
