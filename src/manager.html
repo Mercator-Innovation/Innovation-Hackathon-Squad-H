@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manager summary (prototype)</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="reminders.css">
+  <link rel="stylesheet" href="theme.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to the summary</a>
+
+  <header class="site-header">
+    <p class="service-name" id="service-name">Healthier homes board</p>
+    <p class="banner" id="banner">Prototype with made-up homes. Not a real service and no real tenants.</p>
+  </header>
+
+  <nav class="page-nav" aria-label="Pages">
+    <a href="index.html">Homes to help first</a>
+    <a href="reminders.html">Monthly reminders</a>
+    <a href="manager.html" aria-current="page">Manager summary</a>
+    <a href="tenant.html" target="_blank" class="nav-external">Tenant's view (opens in a new tab)</a>
+  </nav>
+
+  <main id="main" class="manager"></main>
+
+  <script src="data/homes.js"></script>
+  <script src="data/awaab-cases.js"></script>
+  <script src="data/bank-holidays.js"></script>
+  <script src="clock.js"></script>
+  <script src="content.js"></script>
+  <script src="risk.js"></script>
+  <script src="manager.js"></script>
+</body>
+</html>

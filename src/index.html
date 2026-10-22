@@ -19,6 +19,7 @@
   <nav class="page-nav" aria-label="Pages">
     <a href="index.html" aria-current="page">Homes to help first</a>
     <a href="reminders.html">Monthly reminders</a>
+    <a href="manager.html">Manager summary</a>
     <a href="tenant.html" target="_blank" class="nav-external" id="tenant-link">Tenant's view (opens in a new tab)</a>
   </nav>
 
@@ -41,6 +42,20 @@
           </select>
         </div>
         <div class="field">
+          <label for="filter-area">Area</label>
+          <select id="filter-area"><option value="all">All areas</option></select>
+        </div>
+        <div class="field">
+          <label for="filter-urgency">Booked</label>
+          <select id="filter-urgency">
+            <option value="all">Any</option>
+            <option value="Today">For today</option>
+            <option value="This week">For this week</option>
+            <option value="This month">For this month</option>
+            <option value="none">Nothing booked yet</option>
+          </select>
+        </div>
+        <div class="field">
           <label for="filter-search" id="filter-search-label"></label>
           <input type="search" id="filter-search" autocomplete="off">
         </div>
@@ -59,6 +74,7 @@
   <script src="data/bank-holidays.js"></script>
   <script src="clock.js"></script>
   <script src="content.js"></script>
+  <script src="risk.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

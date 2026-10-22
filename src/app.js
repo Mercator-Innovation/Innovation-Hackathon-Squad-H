@@ -10,55 +10,10 @@
   let selectedId = null;
 
   // ---------- Risk rules ----------
+  // The rules live in risk.js, so the manager summary uses exactly the same ones.
 
   function assess(home) {
-    const reasons = [];
-    let score = 0;
-    const add = (points, text) => { score += points; reasons.push({ points, text }); };
-
-    if (home.epc === "F" || home.epc === "G") add(2, C.reasons.epcPoor(home.epc));
-    else if (home.epc === "E") add(1, C.reasons.epcFair(home.epc));
-    if (home.built < 1960) add(1, C.reasons.oldHome(home.built));
-    if (home.condensationJobs >= 2) add(2, C.reasons.condensation(home.condensationJobs));
-    else if (home.condensationJobs === 1) add(1, C.reasons.condensation(1));
-    if (home.leakJobs > 0) add(1, C.reasons.leak(home.leakJobs));
-    if (home.arrearsWeeks > 0) add(1, C.reasons.arrears(home.arrearsWeeks));
-    if (home.fuelVouchers > 0) add(2, C.reasons.fuel(home.fuelVouchers));
-    if (home.gasNoAccess) add(1, C.reasons.gasNoAccess);
-    if (home.monthsSinceContact >= 18) add(1, C.reasons.quiet(home.monthsSinceContact));
-
-    // Questionnaire replies count only once an officer has checked them.
-    const replies = (state[home.id] && state[home.id].replies) || [];
-    const ticked = new Set();
-    replies.filter((r) => r.checked).forEach((r) => r.items.forEach((i) => ticked.add(i)));
-    ticked.forEach((i) => add(C.letterPoints[i], C.reasons.reply(C.letterItems[i])));
-    // Who's at risk at home, from a tenant's report. Only ever saved with their consent.
-    const atRisk = new Set();
-    replies.filter((r) => r.checked).forEach((r) => (r.atRisk || []).forEach((who) => atRisk.add(who)));
-    atRisk.forEach((who) => add(2, C.reasons.atRisk(who)));
-
-    // Support notes count only with the tenant's consent.
-    if (home.consent && home.supportNotes.length) {
-      home.supportNotes.forEach((note) => add(2, C.reasons.supportNote(note)));
-    }
-
-    // Age raises priority only alongside other signs; on its own it means a regular check-in.
-    const older = home.oldestAge >= 75;
-    if (older && score >= 2) add(2, C.reasons.olderPlus);
-
-    let level = "none";
-    if (score >= 7) level = "high";
-    else if (score >= 4) level = "medium";
-    else if (score >= 1) level = "low";
-    if (older && level === "none") {
-      level = "low";
-      reasons.push({ points: 0, text: C.reasons.olderCheckIn });
-    }
-
-    // Strongest reasons first, so the card shows what matters most.
-    reasons.sort((a, b) => b.points - a.points);
-    const unusedNotes = home.consent ? 0 : home.supportNotes.length;
-    return { score, level, reasons: reasons.map((r) => r.text), unusedNotes };
+    return window.Risk.assess(home, state[home.id]);
   }
 
   // Worked out again when a checked reply changes a home's risk.
@@ -164,7 +119,23 @@
         '<p class="error" id="awaab-error" hidden></p>' +
         '<p><button type="button" class="button secondary" data-step="investigate">' + C.awaab.markInvestigated + "</button></p>";
     }
-    if (open.summary) controls += '<p><button type="button" class="button secondary" data-step="summary">' + C.awaab.markSummary + "</button></p>";
+    if (open.summary) {
+      // A draft of the written summary, so the 3-day step is quick: the officer checks it, sends it, marks it sent.
+      const startStep = steps.find((s) => s.key === "start");
+      const L = C.summaryLetter;
+      controls += '<details class="summary-letter" open><summary>' + L.heading + "</summary>" +
+        '<p class="note">' + L.intro + "</p>" +
+        '<div class="field"><label for="summary-letter-text">' + L.label + "</label>" +
+          '<textarea id="summary-letter-text" rows="14">' + escapeHtml(L.text({
+            investigated: formatDate(fromISO(c.investigated)),
+            substantial: c.substantial,
+            startBy: startStep.due ? formatDate(startStep.due) : ""
+          })) + "</textarea></div>" +
+        '<p><button type="button" class="button secondary" id="summary-letter-copy">' + L.copy + "</button></p>" +
+        '<p class="success" id="summary-letter-copied" role="status" hidden>' + L.copied + "</p>" +
+        "</details>";
+      controls += '<p><button type="button" class="button secondary" data-step="summary">' + C.awaab.markSummary + "</button></p>";
+    }
     if (open.start) controls += '<p><button type="button" class="button secondary" data-step="start">' + C.awaab.markStarted + "</button></p>";
     if (open.finish) controls += '<p><button type="button" class="button secondary" data-step="finish">' + C.awaab.markFinished + "</button></p>";
 
@@ -229,11 +200,25 @@
   const detailEl = document.getElementById("detail");
   const levelFilter = document.getElementById("filter-level");
   const searchFilter = document.getElementById("filter-search");
+  const areaFilter = document.getElementById("filter-area");
+  const bookedFilter = document.getElementById("filter-urgency");
   const summaryEl = document.getElementById("summary");
+
+  [...new Set(homes.map((h) => h.area))].sort().forEach((area) => {
+    areaFilter.insertAdjacentHTML("beforeend", "<option>" + area + "</option>");
+  });
+
+  // How urgent the most recently booked action is, or "none" if nothing's been booked.
+  function bookedUrgency(id) {
+    const booked = homeState(id).history.filter((item) => item.type);
+    return booked.length ? booked[booked.length - 1].urgency : "none";
+  }
 
   function renderList() {
     const level = levelFilter.value;
     const search = searchFilter.value.trim().toLowerCase();
+    const area = areaFilter.value;
+    const booked = bookedFilter.value;
 
     // If a dismissed home gets an Awaab's Law clock (say, from a tenant's report), it goes back on the list.
     assessed.forEach((a) => {
@@ -249,6 +234,8 @@
       .filter((a) => {
         const dismissed = !!homeState(a.home.id).dismissed;
         if (search && !(a.home.address + " " + a.home.id).toLowerCase().includes(search)) return false;
+        if (area !== "all" && a.home.area !== area) return false;
+        if (booked !== "all" && bookedUrgency(a.home.id) !== booked) return false;
         if (level === "awaab") return !!awaabStatus(a.home.id);
         if (level === "dismissed") return dismissed;
         if (level !== "all" && (dismissed || a.level !== level)) return false;
@@ -329,6 +316,8 @@
 
   levelFilter.addEventListener("change", renderList);
   searchFilter.addEventListener("input", renderList);
+  areaFilter.addEventListener("change", renderList);
+  bookedFilter.addEventListener("change", renderList);
 
   // ---------- The detail panel ----------
 
@@ -400,6 +389,23 @@
         '<button type="submit" class="button secondary">' + C.replyButton + "</button>" +
       "</form>";
 
+    // Did it work? Once help has been booked, the officer records whether the risk went down.
+    const O = C.outcome;
+    const outcomeBlock = !s.history.some((item) => item.type) ? "" :
+      '<form id="outcome-form" class="outcome" novalidate>' +
+        "<h3>" + O.heading + "</h3>" +
+        (s.outcome ? '<p class="success">' + escapeHtml(O.latest(s.outcome.result, formatDate(fromISO(s.outcome.date)))) +
+          (s.outcome.note ? ": " + escapeHtml(s.outcome.note) : "") + "</p>" : "") +
+        "<fieldset><legend>" + O.legend + "</legend>" +
+          O.options.map((o) => '<label class="radio"><input type="radio" name="outcome" value="' + o + '"><span>' + o + "</span></label>").join("") +
+        "</fieldset>" +
+        '<div class="field"><label for="outcome-note">' + O.noteLabel + "</label>" +
+          '<p class="note" id="outcome-note-hint">' + O.noteHint + "</p>" +
+          '<input type="text" id="outcome-note" aria-describedby="outcome-note-hint"></div>' +
+        '<p class="error" id="outcome-error" hidden></p>' +
+        '<p><button type="submit" class="button secondary">' + O.button + "</button></p>" +
+      "</form>";
+
     // A home with an Awaab's Law clock running can't be dismissed: the legal deadlines still apply.
     const dismissBlock = s.dismissed
       ? '<p class="success">' + escapeHtml(C.dismissed(s.dismissed)) + "</p>" +
@@ -452,6 +458,7 @@
       "</form>" +
 
       "<h3>" + C.historyHeading + "</h3>" + history +
+      outcomeBlock +
       replyBlock +
 
       '<hr class="divider">' +
@@ -566,6 +573,18 @@
       });
     }
 
+    // Copying the drafted summary letter.
+    const copyLetter = document.getElementById("summary-letter-copy");
+    if (copyLetter) {
+      copyLetter.addEventListener("click", () => {
+        const text = document.getElementById("summary-letter-text");
+        text.select();
+        const done = () => { document.getElementById("summary-letter-copied").hidden = false; };
+        if (navigator.clipboard) navigator.clipboard.writeText(text.value).then(done, () => { document.execCommand("copy"); done(); });
+        else { document.execCommand("copy"); done(); }
+      });
+    }
+
     // Undoing a step marked done by mistake (the most recent one only, so the steps stay in order).
     const undoStepButton = document.getElementById("awaab-undo");
     if (undoStepButton) {
@@ -658,6 +677,23 @@
         renderDetail(true);
       });
     });
+
+    const outcomeForm = document.getElementById("outcome-form");
+    if (outcomeForm) {
+      outcomeForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const chosen = outcomeForm.querySelector('input[name="outcome"]:checked');
+        if (!chosen) return showError(document.getElementById("outcome-error"), C.outcome.needed);
+        s.outcome = { result: chosen.value, note: document.getElementById("outcome-note").value.trim(), date: toISO(startOfToday()) };
+        s.history.push({ label: C.outcome.recorded(chosen.value), date: formatDate(startOfToday()) });
+        saveState();
+        renderList();
+        renderDetail(false);
+        const form = document.getElementById("outcome-form");
+        form.setAttribute("tabindex", "-1");
+        form.focus();
+      });
+    }
 
     const dismissForm = document.getElementById("dismiss-form");
     if (dismissForm) {
