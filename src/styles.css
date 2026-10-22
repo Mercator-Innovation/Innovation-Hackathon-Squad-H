@@ -72,6 +72,10 @@ h3 { font-size: 1.05rem; margin-top: 1.25rem; }
   max-width: 1200px;
   margin: 0 auto;
 }
+/* Stop long content (like a wide dropdown) stretching the page on a phone. */
+.layout > * { min-width: 0; }
+select { max-width: 100%; text-overflow: ellipsis; }
+
 @media (min-width: 900px) {
   .layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
   .detail-panel { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow-y: auto; }
@@ -198,7 +202,7 @@ summary { cursor: pointer; color: var(--brand); font-weight: 600; }
 
 /* The Awaab's Law clock */
 .card-clock { display: block; margin-top: 0.35rem; }
-.badge.awaab { color: var(--brand); background: #e3f1ef; }
+.badge.awaab { color: var(--brand); background: #e3f1ef; white-space: normal; border-radius: var(--radius); }
 .badge.awaab.is-late { color: var(--high); background: var(--high-bg); }
 .clock {
   border: 2px solid var(--brand);
@@ -212,6 +216,16 @@ summary { cursor: pointer; color: var(--brand); font-weight: 600; }
 .clock-done { color: var(--good); font-weight: 600; }
 .clock-due { font-weight: 600; }
 .clock-late { color: var(--high); font-weight: 700; }
+.delay { border-top: 1px solid var(--border); padding-top: 0.5rem; }
+.delay .field { margin-bottom: 0.75rem; }
+input[type="date"] {
+  font: inherit;
+  padding: 0.5rem;
+  border: 2px solid var(--text-muted);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
 .warning {
   background: var(--high-bg);
   color: var(--high);

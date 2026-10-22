@@ -85,10 +85,12 @@
     ));
   }
 
-  // Working days are Monday to Friday. Bank holidays aren't counted yet.
+  // Working days are Monday to Friday, skipping Scottish bank holidays (data/bank-holidays.js).
+  const bankHolidays = new Set(window.DATA.bankHolidays || []);
+
   function isWorkingDay(date) {
     const day = date.getDay();
-    return day !== 0 && day !== 6;
+    return day !== 0 && day !== 6 && !bankHolidays.has(toISO(date));
   }
 
   function addWorkingDays(date, days) {
@@ -153,7 +155,11 @@
       { key: "finish", due: c.repairsStarted ? addWorkingDays(fromISO(c.repairsStarted), 20) : null,
         done: c.repairsFinished, notNeeded: noRepairs }
     ];
+    // A recorded delay replaces that step's deadline with the new date.
+    const delays = c.delays || {};
     steps.forEach((s) => {
+      s.delay = delays[s.key] || null;
+      if (s.delay && !s.done) s.due = fromISO(s.delay.newDate);
       s.open = !s.done && !s.notNeeded && !!s.due;
       if (s.open) s.daysLeft = workingDaysFromToday(s.due);
     });
@@ -176,7 +182,8 @@
   function awaabBadge(status) {
     return '<span class="badge awaab' + (status.late ? " is-late" : "") + '">' +
       (status.late ? '<span aria-hidden="true">! </span>' : "") + C.awaab.cardLabel + ": " +
-      C.awaab.steps[status.next.key].label + ", " + daysText(status.next.daysLeft) + "</span>";
+      C.awaab.steps[status.next.key].label + ", " + daysText(status.next.daysLeft) +
+      (status.next.delay ? " (" + C.awaab.delayedTag + ")" : "") + "</span>";
   }
 
   function renderAwaab(c) {
@@ -191,6 +198,10 @@
       else if (s.open) {
         status = '<span class="' + (s.daysLeft < 0 ? "clock-late" : "clock-due") + '">' +
           C.awaab.dueBy(formatDate(s.due)) + ": " + daysText(s.daysLeft) + "</span>";
+        if (s.delay) {
+          status += '<br><span class="note">' + escapeHtml(C.awaab.delayed(formatDate(s.due), s.delay.reason)) +
+            ". " + escapeHtml(C.awaab.delayInterimShown(s.delay.interim)) + ".</span>";
+        }
       } else status = '<span class="note">' + C.awaab.waiting + "</span>";
       return "<li><strong>" + step.label + "</strong> <span class=\"note\">" + step.rule + "</span><br>" + status + "</li>";
     }).join("");
@@ -210,12 +221,36 @@
     if (open.start) controls += '<p><button type="button" class="button secondary" data-step="start">' + C.awaab.markStarted + "</button></p>";
     if (open.finish) controls += '<p><button type="button" class="button secondary" data-step="finish">' + C.awaab.markFinished + "</button></p>";
 
+    const openSteps = steps.filter((s) => s.open);
+    const delayForm = !openSteps.length ? "" :
+      '<details class="delay"><summary>' + C.awaab.delayHeading + "</summary>" +
+        '<p class="note">' + C.awaab.delayIntro + "</p>" +
+        '<form id="delay-form" novalidate>' +
+          '<div class="field"><label for="delay-step">' + C.awaab.delayStepLabel + "</label>" +
+            '<select id="delay-step">' + openSteps.map((s) => (
+              '<option value="' + s.key + '">' + C.awaab.steps[s.key].label + " (" + C.awaab.dueBy(formatDate(s.due)).toLowerCase() + ")</option>"
+            )).join("") + "</select></div>" +
+          '<div class="field"><label for="delay-reason">' + C.awaab.delayReasonLabel + "</label>" +
+            '<select id="delay-reason">' + C.awaab.delayReasons.map((r) => "<option>" + r + "</option>").join("") + "</select></div>" +
+          '<div class="field"><label for="delay-date">' + C.awaab.delayDateLabel + "</label>" +
+            '<input type="date" id="delay-date"></div>' +
+          "<fieldset><legend>" + C.awaab.delayInterimLegend + "</legend>" +
+            C.awaab.delayInterim.map((step) => (
+              '<label class="check"><input type="checkbox" name="interim" value="' + step + '"><span>' + step + "</span></label>"
+            )).join("") + "</fieldset>" +
+          '<label class="check"><input type="checkbox" id="delay-told"><span>' + C.awaab.delayToldCheck + "</span></label>" +
+          '<p class="error" id="delay-error" hidden></p>' +
+          '<button type="submit" class="button secondary">' + C.awaab.delayButton + "</button>" +
+        "</form>" +
+      "</details>";
+
     return '<div class="clock" id="awaab-clock">' +
       "<h3>" + C.awaab.heading + "</h3>" +
       '<p class="note">' + C.awaab.intro + " " + C.awaab.aware(formatDate(fromISO(c.aware))) + "</p>" +
       '<ol class="clock-steps">' + items + "</ol>" +
       (anyLate ? '<p class="warning">' + C.awaab.lateNote + "</p>" : "") +
       (controls ? '<div id="awaab-controls">' + controls + "</div>" : '<p class="clock-done">' + C.awaab.closed + "</p>") +
+      delayForm +
       "</div>";
   }
 
@@ -463,6 +498,39 @@
         if (step === "start") s.awaab.repairsStarted = todayISO;
         if (step === "finish") s.awaab.repairsFinished = todayISO;
         s.history.push({ label: C.awaab.steps[step].label + ": done", date: formatDate(startOfToday()) });
+        saveState();
+        renderList();
+        renderDetail(false);
+        const clock = document.getElementById("awaab-clock");
+        clock.setAttribute("tabindex", "-1");
+        clock.focus();
+      });
+    }
+
+    // Recording a delay: which deadline, why, a new date, interim steps, and that the tenant was told.
+    const delayForm = document.getElementById("delay-form");
+    if (delayForm) {
+      delayForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const error = document.getElementById("delay-error");
+        const key = document.getElementById("delay-step").value;
+        const step = awaabSteps(s.awaab).find((x) => x.key === key);
+        const newDate = document.getElementById("delay-date").value;
+        const interim = [...delayForm.querySelectorAll('input[name="interim"]:checked')].map((i) => i.value);
+        if (!newDate || fromISO(newDate) <= step.due || fromISO(newDate) < startOfToday()) {
+          return showError(error, C.awaab.delayDateNeeded);
+        }
+        if (!interim.length) return showError(error, C.awaab.delayInterimNeeded);
+        if (!document.getElementById("delay-told").checked) return showError(error, C.awaab.delayToldNeeded);
+
+        const reason = document.getElementById("delay-reason").value;
+        s.awaab.delays = s.awaab.delays || {};
+        s.awaab.delays[key] = { reason, newDate, interim, recorded: toISO(startOfToday()) };
+        s.history.push({
+          label: C.awaab.delayRecorded(C.awaab.steps[key].label),
+          date: formatDate(startOfToday()),
+          awaab: C.awaab.delayed(formatDate(fromISO(newDate)), reason)
+        });
         saveState();
         renderList();
         renderDetail(false);
