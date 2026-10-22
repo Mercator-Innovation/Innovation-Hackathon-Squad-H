@@ -27,6 +27,12 @@
     if (home.gasNoAccess) add(1, C.reasons.gasNoAccess);
     if (home.monthsSinceContact >= 18) add(1, C.reasons.quiet(home.monthsSinceContact));
 
+    // Questionnaire replies count only once an officer has checked them.
+    const replies = (state[home.id] && state[home.id].replies) || [];
+    const ticked = new Set();
+    replies.filter((r) => r.checked).forEach((r) => r.items.forEach((i) => ticked.add(i)));
+    ticked.forEach((i) => add(C.letterPoints[i], C.reasons.reply(C.letterItems[i])));
+
     // Support notes count only with the tenant's consent.
     if (home.consent && home.supportNotes.length) {
       home.supportNotes.forEach((note) => add(2, C.reasons.supportNote(note)));
@@ -51,7 +57,12 @@
     return { score, level, reasons: reasons.map((r) => r.text), unusedNotes };
   }
 
-  const assessed = homes.map((home) => ({ home, ...assess(home) }));
+  // Worked out again when a checked reply changes a home's risk.
+  let assessed = [];
+  function reassess() {
+    assessed = homes.map((home) => ({ home, ...assess(home) }));
+  }
+  reassess();
   const levelOrder = { high: 0, medium: 1, low: 2, none: 3 };
 
   // ---------- Saving what officers did ----------
@@ -238,13 +249,15 @@
       const status = s.dismissed
         ? '<span class="badge status">' + C.dismissedLabel + "</span>"
         : s.history.length ? '<span class="badge status">' + C.actionTakenLabel + "</span>" : "";
+      const replyBadge = (s.replies || []).some((r) => !r.checked)
+        ? '<span class="badge reply">' + C.replyToCheck + "</span>" : "";
       const clock = awaabStatus(a.home.id);
       const shortReasons = a.reasons.slice(0, 2).join("; ") + (a.reasons.length > 2 ? "; and more" : "");
       return '<li><button type="button" class="home-card level-' + a.level + (s.dismissed ? " is-dismissed" : "") +
         '" data-id="' + a.home.id + '"' + (a.home.id === selectedId ? ' aria-current="true"' : "") + ">" +
         '<span class="card-top"><span class="card-address">' + a.home.address + "</span>" +
         '<span class="card-ref">' + a.home.id + ", " + a.home.area + "</span></span>" +
-        "<span>" + badge(a.level) + status + "</span>" +
+        "<span>" + badge(a.level) + status + replyBadge + "</span>" +
         (clock ? '<span class="card-clock">' + awaabBadge(clock) + "</span>" : "") +
         '<span class="card-reasons">' + (shortReasons || C.noReasons) + "</span>" +
         "</button></li>";
@@ -278,7 +291,7 @@
       : '<p>' + C.noReasons + "</p>";
 
     const actionOptions = Object.keys(C.actions).map((key) => (
-      '<label class="radio"><input type="radio" name="action" value="' + key + '"><span>' +
+      '<label class="radio"><input type="checkbox" name="action" value="' + key + '"><span>' +
       C.actions[key].label + "<small>" + C.actions[key].team + "</small></span></label>"
     )).join("");
 
@@ -292,6 +305,30 @@
           (item.awaab ? ". " + escapeHtml(item.awaab) : "") + "</li>"
         )).join("") + "</ul>"
       : '<p class="note">' + C.noHistory + "</p>";
+
+    // The reply section shows once a questionnaire has been sent.
+    const replies = s.replies || [];
+    const sentLetter = s.history.some((item) => item.type === "letter");
+    const replyBlock = !sentLetter && !replies.length ? "" :
+      '<hr class="divider">' +
+      "<h3>" + C.replyHeading + "</h3>" +
+      replies.map((r, index) => (
+        '<div class="letter reply-received"><p><strong>' + C.replyReceived(formatDate(fromISO(r.date))) + "</strong></p>" +
+          "<ul>" + r.items.map((i) => "<li>" + C.letterItems[i] + "</li>").join("") + "</ul>" +
+          (r.checked
+            ? '<p class="success">' + C.replyChecked + "</p>"
+            : '<p><button type="button" class="button secondary" data-reply="' + index + '">' + C.replyCheckButton + "</button></p>") +
+        "</div>"
+      )).join("") +
+      '<form id="reply-form" novalidate>' +
+        '<p class="note">' + C.replyIntro + "</p>" +
+        "<fieldset><legend>" + C.replyLegend + "</legend>" +
+          C.letterItems.map((item, i) => (
+            '<label class="check"><input type="checkbox" name="reply" value="' + i + '"><span>' + item + "</span></label>"
+          )).join("") + "</fieldset>" +
+        '<p class="error" id="reply-error" hidden></p>' +
+        '<button type="submit" class="button secondary">' + C.replyButton + "</button>" +
+      "</form>";
 
     const dismissBlock = s.dismissed
       ? '<p class="success">' + escapeHtml(C.dismissed(s.dismissed)) + "</p>" +
@@ -340,6 +377,7 @@
       "</form>" +
 
       "<h3>" + C.historyHeading + "</h3>" + history +
+      replyBlock +
 
       '<hr class="divider">' +
       "<h3>" + C.dismissHeading + "</h3>" + dismissBlock;
@@ -365,45 +403,44 @@
     actionForm.addEventListener("submit", (event) => {
       event.preventDefault();
       const error = document.getElementById("action-error");
-      const chosen = actionForm.querySelector('input[name="action"]:checked');
-      if (!chosen) return showError(error, C.chooseAction);
+      const chosen = [...actionForm.querySelectorAll('input[name="action"]:checked')].map((i) => i.value);
+      if (!chosen.length) return showError(error, C.chooseAction);
       if (!document.getElementById("confirm-check").checked) return showError(error, C.confirmNeeded);
       showError(error, "");
 
-      const action = C.actions[chosen.value];
       const today = new Date();
-      const entry = {
-        type: chosen.value,
-        label: action.label,
-        team: action.team,
-        urgency: document.getElementById("urgency").value,
-        date: formatDate(today)
-      };
-      // A damp check means the landlord is aware, so the Awaab's Law clock starts,
-      // unless one is already running for this home.
-      if (chosen.value === "damp") {
-        if (awaabStatus(home.id)) {
-          entry.awaab = C.awaabAlreadyRunning;
-        } else {
-          s.awaab = newCase();
-          entry.awaab = C.awaabStarted(formatDate(addWorkingDays(startOfToday(), 10)));
+      const urgency = document.getElementById("urgency").value;
+      const entries = chosen.map((type) => {
+        const action = C.actions[type];
+        const entry = { type, label: action.label, team: action.team, urgency, date: formatDate(today) };
+        // A damp check means the landlord is aware, so the Awaab's Law clock starts,
+        // unless one is already running for this home.
+        if (type === "damp") {
+          if (awaabStatus(home.id)) {
+            entry.awaab = C.awaabAlreadyRunning;
+          } else {
+            s.awaab = newCase();
+            entry.awaab = C.awaabStarted(formatDate(addWorkingDays(startOfToday(), 10)));
+          }
         }
-      }
+        return entry;
+      });
 
-      s.history.push(entry);
+      s.history.push(...entries);
       saveState();
       renderList();
       renderDetail(false);
       const result = document.getElementById("action-result");
-      result.innerHTML = '<p class="success" tabindex="-1" id="action-success">' +
-        escapeHtml(entry.label) + ": done." + (entry.awaab ? " " + escapeHtml(entry.awaab) : "") + "</p>";
+      result.innerHTML = '<p class="success" tabindex="-1" id="action-success">' + entries.map((entry) => (
+        escapeHtml(entry.label) + ": done." + (entry.awaab ? " " + escapeHtml(entry.awaab) : "")
+      )).join("<br>") + "</p>";
       document.getElementById("action-success").focus();
     });
 
     // Open the questionnaire preview when that action is chosen.
     actionForm.addEventListener("change", (event) => {
-      if (event.target.name === "action") {
-        document.getElementById("letter-preview").open = event.target.value === "letter";
+      if (event.target.name === "action" && event.target.value === "letter") {
+        document.getElementById("letter-preview").open = event.target.checked;
       }
     });
 
@@ -466,6 +503,50 @@
         clock.focus();
       });
     }
+
+    // Recording a questionnaire reply. Damp or mould means the landlord is now aware,
+    // so the Awaab's Law clock starts today, before an officer checks the reply.
+    const replyForm = document.getElementById("reply-form");
+    if (replyForm) {
+      replyForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const items = [...replyForm.querySelectorAll('input[name="reply"]:checked')].map((i) => Number(i.value));
+        if (!items.length) return showError(document.getElementById("reply-error"), C.replyNeeded);
+
+        s.replies = s.replies || [];
+        s.replies.push({ date: toISO(startOfToday()), items, checked: false });
+        const entry = { label: C.replyHistory, date: formatDate(startOfToday()) };
+        if (items.includes(0)) {
+          if (awaabStatus(home.id)) {
+            entry.awaab = C.awaabAlreadyRunning;
+          } else {
+            s.awaab = newCase();
+            entry.awaab = C.replyDampStarted(formatDate(addWorkingDays(startOfToday(), 10)));
+          }
+        }
+        s.history.push(entry);
+        saveState();
+        renderList();
+        renderDetail(false);
+        if (entry.awaab) {
+          const clock = document.getElementById("awaab-clock");
+          clock.setAttribute("tabindex", "-1");
+          clock.focus();
+        }
+      });
+    }
+
+    // An officer checks a reply before it changes the home's risk.
+    detailEl.querySelectorAll("button[data-reply]").forEach((button) => {
+      button.addEventListener("click", () => {
+        s.replies[Number(button.dataset.reply)].checked = true;
+        s.history.push({ label: C.replyCheckedHistory, date: formatDate(startOfToday()) });
+        saveState();
+        reassess();
+        renderList();
+        renderDetail(true);
+      });
+    });
 
     const dismissForm = document.getElementById("dismiss-form");
     if (dismissForm) {
