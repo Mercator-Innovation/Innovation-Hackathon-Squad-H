@@ -146,6 +146,7 @@ window.CONTENT = {
     intro: "Damp and mould are not your fault. Tell us and we'll come and look. It takes about 2 minutes.",
     navReport: "Report a problem",
     navCheck: "Check on my report",
+    navHelp: "Help and your rights",
 
     whoLegend: "Who's telling us?",
     whoOptions: { tenant: "I live there (I'm the tenant)", other: "I'm telling you about someone else's home" },
@@ -170,6 +171,20 @@ window.CONTENT = {
     riskOptions: ["A baby or child under 5", "Someone aged 75 or over", "Someone with a breathing condition, like asthma", "Someone who is pregnant", "Someone with a long-term illness or disability"],
     riskConsent: "I'm happy for the housing team to use this to help sooner. It's kept private and only used for repairs and support.",
     riskConsentNeeded: "Tick the box to say we can use this, or untick the answers about who's at risk.",
+
+    photoLabel: "Add a photo (optional)",
+    photoHint: "A photo of the damp or mould helps us see how bad it is. Only the housing team sees it. Try not to include people.",
+    photoRemove: "Remove photo",
+    photoAlt: "Your photo of the damp or mould",
+    photoProblem: "That photo didn't work. Try a different one, or send the report without it.",
+
+    visitLegend: "When's best for us to visit? (optional)",
+    visitHint: "Tick all that suit you.",
+    visitTimes: ["Weekday mornings", "Weekday afternoons", "Early evenings", "Any time"],
+    needsLegend: "Anything we should know before we visit? (optional)",
+    needsOptions: ["There's a dog or other pet", "I need an interpreter", "I need time to get to the door", "I'd like someone with me, like family or a support worker"],
+    needsNoteLabel: "Anything else about the visit (optional)",
+    needsNoteHint: "For example: which language, or the best door to use.",
 
     energyLegend: "Help with heating costs",
     energyCheck: "I'd like free help with my energy bills",
@@ -216,13 +231,52 @@ window.CONTENT = {
     checkNotNeeded: "Not needed: we didn't find damp or mould that needs repairs",
     checkDelayed: (date) => "Delayed. New date: " + date + ". We'll have told you why.",
     checkLate: "This is late. We're sorry. Your housing officer will be in touch.",
-    checkPrivacy: "In a real service, you'd sign in first so only you can see this."
+    checkPrivacy: "In a real service, you'd sign in first so only you can see this.",
+    helpLink: "Help while you wait, and your rights",
+
+    // Help and your rights. From Shelter Scotland's advice on damp and mould in social housing,
+    // and our research note. General help, not medical or legal advice.
+    helpTitle: "Help and your rights",
+    waitHeading: "While you wait",
+    waitIntro: "Damp and mould are not your fault. These small things can help a bit until we come.",
+    waitTips: [
+      "Open a window a little, or use the fan, when you cook, shower or dry clothes.",
+      "Keep a small gap between big furniture and outside walls.",
+      "Don't paint over mould. Leave it for us to look at.",
+      "If heating costs worry you, ask us for free help with your energy bills."
+    ],
+    healthHeading: "If it's affecting your health",
+    healthTips: [
+      "If you or someone at home feels unwell, call NHS 24 on 111, or speak to your GP.",
+      "In an emergency, call 999.",
+      "Your GP can write a letter about how damp or mould affects your health. Keep it: it helps if you need to complain."
+    ],
+    rightsHeading: "Your rights",
+    rightsIntro: "The law (Awaab's Law) sets deadlines for us once you tell us about damp or mould:",
+    rightsSteps: [
+      "We look at your home within 10 working days.",
+      "We tell you in writing what we found within 3 working days after that.",
+      "If repairs are needed, they start within 5 working days.",
+      "Repairs are finished within 20 working days of starting."
+    ],
+    rightsLate: "If we can't meet a deadline, we must tell you why in writing and give you a new date. We should also help in the meantime, for example with a dehumidifier.",
+    complainHeading: "If you're not happy",
+    complainSteps: [
+      "Tell us. We'll try to sort it out within 5 working days.",
+      "Still not happy? Ask for a senior person to look at it. They'll reply within 20 working days.",
+      "Still not happy after that? You can complain to the Scottish Public Services Ombudsman (SPSO). It's free and independent. Do this within a year of first telling us."
+    ],
+    complainTip: "Keep a note of dates, and take photos. It helps if you need to complain.",
+    moreHelp: "Free advice: Shelter Scotland's helpline, or your local Citizens Advice."
   },
 
   // How tenant reports show on the board.
   reportOther: (relation, knows) => "Reported by someone else (" + relation.toLowerCase() + "). Does the tenant know? " + knows,
   reportAtRisk: "At risk at home (shared with consent): ",
   reportEnergy: "Asked for help with energy bills",
+  reportVisitTimes: "Best time to visit: ",
+  reportVisitNeeds: "Before visiting: ",
+  reportPhotoAlt: "Photo of the damp or mould, sent with the report",
 
   dismissHeading: "Not needed?",
   dismissLabel: "Why you're dismissing this flag",
