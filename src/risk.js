@@ -34,8 +34,22 @@
       home.supportNotes.forEach((note) => add(2, C.reasons.supportNote(note)));
     }
 
-    // Age raises priority only alongside other signs; on its own it means a regular check-in.
+    // Sensor pilot: damp air or a cold home on most of the last 7 days.
+    const sensor = sensorSummary(home.id);
+    if (sensor && sensor.dampDays >= 3) add(2, C.reasons.sensorDamp(sensor.dampDays));
+    if (sensor && sensor.coldDays >= 3) add(2, C.reasons.sensorCold(sensor.coldDays, sensor.coldest));
+
+    // A cold snap coming raises homes that are hard to heat AND have someone more vulnerable to cold.
+    const snap = coldSnap();
     const older = home.oldestAge >= 75;
+    if (snap) {
+      const vulnerable = older || atRisk.size > 0 || /baby|under 5/i.test(home.household) ||
+        (home.consent && home.supportNotes.some((n) => /breath|copd|asthma|health|hospital|dementia|wheelchair|illness|early/i.test(n)));
+      const hardToHeat = ["E", "F", "G"].includes(home.epc) || home.fuelVouchers > 0 || (sensor && sensor.coldDays >= 3);
+      if (vulnerable && hardToHeat) add(2, C.reasons.coldSnap(snap.lowest));
+    }
+
+    // Age raises priority only alongside other signs; on its own it means a regular check-in.
     if (older && score >= 2) add(2, C.reasons.olderPlus);
 
     let level = "none";
@@ -53,5 +67,28 @@
     return { score, level, reasons: reasons.map((r) => r.text), unusedNotes };
   }
 
-  window.Risk = { assess };
+  // Damp air means humidity of 70% or more; a cold home means below 16°C. Both are our assumptions
+  // for the prototype: the thresholds would need checking with Cloch and the sensor supplier.
+  function sensorSummary(id) {
+    const s = window.DATA && window.DATA.sensors && window.DATA.sensors[id];
+    if (!s) return null;
+    return {
+      humidity: s.humidity, temp: s.temp,
+      dampDays: s.humidity.filter((h) => h >= 70).length,
+      coldDays: s.temp.filter((t) => t < 16).length,
+      coldest: Math.min(...s.temp),
+      dampest: Math.max(...s.humidity)
+    };
+  }
+
+  // A cold snap: a night at or below 0°C in the next 5 days of the forecast.
+  function coldSnap() {
+    const w = window.DATA && window.DATA.weather;
+    if (!w) return null;
+    const cold = w.days.filter((d) => d.day <= 5 && d.low <= 0);
+    if (!cold.length) return null;
+    return { from: cold[0].day, to: cold[cold.length - 1].day, lowest: Math.min(...cold.map((d) => d.low)) };
+  }
+
+  window.Risk = { assess, sensorSummary, coldSnap };
 })();

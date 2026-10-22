@@ -421,6 +421,36 @@ window.CONTENT = {
     ].join("\n")
   },
 
+  // Cold snap alert, sensor readings and the map. All from made-up data.
+  coldSnapBanner: (from, to, lowest, n) => "Cold snap coming " + from + (to !== from ? " to " + to : "") +
+    ", down to " + lowest + "°C." + (n == null ? "" : " " + n + (n === 1 ? " home that is" : " homes that are") +
+    " hard to heat, with someone more at risk from cold, " + (n === 1 ? "has" : "have") + " moved up the list."),
+  coldSnapButton: "Show homes affected",
+  coldSnapFilter: "Cold snap: homes affected",
+  dayName: (n) => n === 0 ? "today" : n === 1 ? "tomorrow" : new Date(Date.now() + n * 864e5).toLocaleDateString("en-GB", { weekday: "long" }),
+  sensor: {
+    heading: "Sensor readings (pilot)",
+    intro: "Made-up readings from the living room, for the last 7 days.",
+    cols: ["Day", "Highest humidity", "Lowest temperature"],
+    daysAgo: (n) => n === 0 ? "Today" : n === 1 ? "Yesterday" : n + " days ago",
+    damp: (n) => "Damp air on " + n + " of 7 days. Mould is likely above 70% humidity.",
+    cold: (n, t) => "Below 16°C on " + n + " of 7 days, coldest " + t + "°C.",
+    fine: "Readings look fine this week.",
+    flagDamp: "damp",
+    flagCold: "too cold"
+  },
+  mapPageLink: "Map",
+  map: {
+    title: "Map of homes",
+    intro: "A simple drawing of the made-up streets, not a real map. Each home shows its risk. Choose one to open it on the board.",
+    alt: "Map of 5 areas and their streets, with each home marked by its risk level",
+    legendHeading: "Key",
+    clock: "Ring: Awaab's Law clock running",
+    sensor: "Small dot: in the sensor pilot",
+    listHeading: "Homes by street",
+    listIntro: "The same homes as the map, as a list."
+  },
+
   // Did it work? (recorded by the officer once help has been given)
   outcome: {
     heading: "Did it work?",
@@ -448,6 +478,9 @@ window.CONTENT = {
     quiet: (m) => "No contact for " + m + " months",
     supportNote: (note) => "Support note (tenant said yes): " + note,
     reply: (item) => "Tenant said: " + item,
+    sensorDamp: (n) => "Sensor: damp air (humidity 70% or more) on " + n + " of the last 7 days",
+    sensorCold: (n, t) => "Sensor: home below 16°C on " + n + " of the last 7 days (coldest " + t + "°C)",
+    coldSnap: (t) => "Cold snap coming (down to " + t + "°C), and the home is hard to heat with someone more at risk from cold",
     atRisk: (who) => "At risk at home (shared with consent): " + who,
     olderPlus: "Tenant is 75 or over, and there are other signs",
     olderCheckIn: "Tenant is 75 or over: time for a regular check-in"

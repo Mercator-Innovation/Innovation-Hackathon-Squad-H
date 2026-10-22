@@ -270,6 +270,28 @@
     areaFilter.insertAdjacentHTML("beforeend", "<option>" + area + "</option>");
   });
 
+  // Whether a cold snap in the forecast is one of this home's reasons.
+  function coldSnapHit(a) {
+    const snap = window.Risk.coldSnap();
+    return !!snap && a.reasons.includes(C.reasons.coldSnap(snap.lowest));
+  }
+
+  // Sensor readings for a home in the pilot: the last 7 days, newest first.
+  function renderSensors(id) {
+    const s = window.Risk.sensorSummary(id);
+    if (!s) return "";
+    const S = C.sensor;
+    const days = s.humidity.map((h, i) => ({ h, t: s.temp[i], ago: s.humidity.length - 1 - i })).reverse();
+    const flag = (over, word) => over ? ' <span class="sensor-flag">(' + word + ")</span>" : "";
+    const notes = [s.dampDays >= 3 ? S.damp(s.dampDays) : "", s.coldDays >= 3 ? S.cold(s.coldDays, s.coldest) : ""].filter(Boolean);
+    return "<h3>" + S.heading + "</h3>" +
+      '<p class="note">' + S.intro + "</p>" +
+      "<p>" + (notes.length ? notes.join(" ") : S.fine) + "</p>" +
+      '<div class="table-wrap"><table class="sensor-table"><thead><tr>' + S.cols.map((c) => '<th scope="col">' + c + "</th>").join("") +
+      "</tr></thead><tbody>" + days.map((d) => '<tr><th scope="row">' + S.daysAgo(d.ago) + "</th><td>" + d.h + "%" + flag(d.h >= 70, S.flagDamp) +
+        "</td><td>" + d.t + "°C" + flag(d.t < 16, S.flagCold) + "</td></tr>").join("") + "</tbody></table></div>";
+  }
+
   // How urgent the most recently booked action is, or "none" if nothing's been booked.
   function bookedUrgency(id) {
     const booked = homeState(id).history.filter((item) => item.type);
@@ -300,6 +322,7 @@
         if (booked !== "all" && bookedUrgency(a.home.id) !== booked) return false;
         if (level === "awaab") return !!awaabStatus(a.home.id);
         if (level === "quiet") return !!quietStatus(a.home.id);
+        if (level === "coldsnap") return coldSnapHit(a);
         if (level === "dismissed") return dismissed;
         if (level !== "all" && (dismissed || a.level !== level)) return false;
         return true;
@@ -338,6 +361,14 @@
     const banner = document.getElementById("quiet-banner");
     banner.hidden = !quietCount || level === "quiet";
     document.getElementById("quiet-banner-text").textContent = C.quiet.banner(quietCount);
+    // A cold snap in the forecast: say so at the top, with a way to see the homes it affects.
+    const snap = window.Risk.coldSnap();
+    const coldBanner = document.getElementById("cold-banner");
+    coldBanner.hidden = !snap || level === "coldsnap";
+    if (snap) {
+      document.getElementById("cold-banner-text").textContent =
+        C.coldSnapBanner(C.dayName(snap.from), C.dayName(snap.to), snap.lowest, assessed.filter(coldSnapHit).length);
+    }
 
     if (!visible.length) {
       listEl.innerHTML = '<li class="note">' + C.noResults + "</li>";
@@ -388,6 +419,12 @@
   });
 
   levelFilter.addEventListener("change", renderList);
+  document.getElementById("cold-banner-button").textContent = C.coldSnapButton;
+  document.getElementById("cold-banner-button").addEventListener("click", () => {
+    levelFilter.value = "coldsnap";
+    renderList();
+    listEl.focus();
+  });
   document.getElementById("quiet-banner-button").textContent = C.quiet.bannerButton;
   document.getElementById("quiet-banner-button").addEventListener("click", () => {
     levelFilter.value = "quiet";
@@ -519,6 +556,7 @@
         "<dt>Built</dt><dd>" + h.built + "</dd>" +
         "<dt>Consent</dt><dd>" + (h.consent ? C.consentYes : C.consentNo) + "</dd>" +
       "</dl>" +
+      renderSensors(h.id) +
 
       '<hr class="divider">' +
       "<h3>" + C.actionHeading + "</h3>" +
@@ -849,8 +887,12 @@
   document.getElementById("filter-level-label").textContent = C.filterLevel;
   document.getElementById("filter-search-label").textContent = C.filterSearch;
 
+  // Opening a home from the map (index.html#H-101).
+  const fromLink = location.hash.slice(1);
+  if (homes.some((h) => h.id === fromLink)) selectedId = fromLink;
+
   renderList();
-  renderDetail(false);
+  renderDetail(!!selectedId);
 
   // A tenant's report from tenant.html, open in another tab, shows up here straight away.
   window.addEventListener("storage", (event) => {
