@@ -279,6 +279,54 @@ window.CONTENT = {
     moreHelp: "Free advice: Shelter Scotland's helpline, or your local Citizens Advice."
   },
 
+  // What we know about your home (tenant page, check view). Friendly words, no judgement.
+  knowHeading: "What we use to decide who to help first",
+  knowIntro: "We look at a few things together, never just one, to see who might need help with damp or cold before it makes anyone ill. A person always decides.",
+  know: {
+    epc: (b) => "Your home's energy rating is " + b + " (A is best, G is worst).",
+    built: (y) => "Your home was built in " + y + ".",
+    jobs: (c, l) => "In the last year: " + c + " condensation or mould " + (c === 1 ? "repair" : "repairs") + " and " + l + " leak " + (l === 1 ? "repair" : "repairs") + ".",
+    arrears: "Whether rent is behind. This is only so we can offer help, never to blame anyone.",
+    fuel: "Whether you've asked us for fuel vouchers.",
+    gas: "Whether we could get in for the last gas safety check.",
+    contact: "When we last spoke to you.",
+    age: "The age of the oldest person at home.",
+    notesYes: "Notes from our support team, because you agreed we can use them.",
+    notesNo: "You haven't agreed to us using notes from our support team, so we don't.",
+    reports: "What you've told us in reports or questionnaires."
+  },
+  knowChange: "If something's wrong, or you'd like us to stop using something, tell your housing officer.",
+
+  // The manager summary page (manager.html).
+  manager: {
+    title: "Manager summary",
+    intro: "The whole picture across every home, worked out with the same rules as the board.",
+    risk: "Homes by risk",
+    levels: { high: "High: act this week", medium: "Medium: act this month", low: "Low: keep an eye on" },
+    waiting: "New reports waiting for a check",
+    running: "Awaab's Law clocks running",
+    late: "Deadlines missed",
+    dismissed: "Flags dismissed",
+    dueHeading: "Legal deadlines in the next 5 working days, and any missed",
+    dueNone: "Nothing due in the next 5 working days.",
+    dueCols: ["Home", "Step", "Due", "Days left"],
+    areaHeading: "Risk by area",
+    areaCols: ["Area", "High", "Medium", "Low", "Clocks running"],
+    figuresHeading: "Damp and mould figures (for reporting)",
+    figuresNote: "Since April 2025 the Scottish Housing Regulator asks landlords for damp and mould figures. The exact measures would need checking with Cloch: these show the kind of thing the board can count.",
+    figures: {
+      cases: "Damp and mould cases opened (clock started)",
+      investigatedOnTime: "Investigated within 10 working days",
+      investigatedLate: "Investigated late",
+      repairsFinished: "Repairs finished",
+      delays: "Delays recorded, with the tenant told"
+    },
+    outcomesHeading: "Did it work?",
+    outcomesNone: "No outcomes recorded yet. Officers record them on each home.",
+    lateWord: (n) => n + (n === 1 ? " day late" : " days late"),
+    leftWord: (n) => n === 0 ? "Due today" : n + (n === 1 ? " day" : " days")
+  },
+
   // How tenant reports show on the board.
   reportOther: (relation, knows) => "Reported by someone else (" + relation.toLowerCase() + "). Does the tenant know? " + knows,
   reportAtRisk: "At risk at home (shared with consent): ",
@@ -299,6 +347,49 @@ window.CONTENT = {
 
   historyHeading: "What's been done",
   noHistory: "Nothing yet.",
+
+  // The written summary letter (Awaab's Law: within 3 working days of investigating).
+  summaryLetter: {
+    heading: "Draft the letter to the tenant",
+    intro: "Check and change this draft, then send it and mark the summary sent.",
+    label: "Letter to the tenant",
+    copy: "Copy the letter",
+    copied: "Copied. Paste it into your letter or email.",
+    text: (o) => [
+      "Dear tenant,",
+      "",
+      "We came to look at damp or mould in your home on " + o.investigated + ". Thank you for letting us in.",
+      "",
+      "What we found:",
+      o.substantial
+        ? "There is damp or mould that needs repairs. [Add where, and what's causing it.]"
+        : "We didn't find damp or mould that needs repairs. [Add what we saw, and any advice.]",
+      "",
+      "What happens next:",
+      o.substantial
+        ? "Repairs will start by " + o.startBy + ". We'll finish them within 20 working days of starting. We'll tell you if anything changes, and why."
+        : "If it comes back or gets worse, please tell us straight away.",
+      "",
+      "If you're not happy with this, tell us and we'll try to sort it out. You can also complain to the Scottish Public Services Ombudsman.",
+      "",
+      "From your housing officer"
+    ].join("\n")
+  },
+
+  // Did it work? (recorded by the officer once help has been given)
+  outcome: {
+    heading: "Did it work?",
+    legend: "Since we helped, the risk for this home has",
+    options: ["Gone down", "Stayed the same", "Gone up", "Too early to tell"],
+    noteLabel: "What changed (optional)",
+    noteHint: "For example: new extractor fan fitted, tenant now warmer.",
+    button: "Record the outcome",
+    needed: "Choose what happened.",
+    recorded: (result) => "Outcome: " + result.toLowerCase(),
+    latest: (result, date) => "Last outcome: " + result.toLowerCase() + ", " + date
+  },
+  filterArea: "Area",
+  filterBooked: "Booked",
 
   reasons: {
     epcPoor: (b) => "Energy rating " + b + ": hard and costly to heat",

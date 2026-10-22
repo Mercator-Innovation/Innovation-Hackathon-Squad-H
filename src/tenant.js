@@ -334,9 +334,27 @@
       const home = findHome(refText, false);
       showError("check-ref", !refText.trim() ? T.refNeeded : !home ? T.refNotFound : "");
       const result = document.getElementById("check-result");
-      result.innerHTML = home ? progress(home.id) : "";
+      result.innerHTML = home ? progress(home.id) + whatWeKnow(home) : "";
       if (home) result.focus();
     });
+  }
+
+  // What Cloch uses about this home to decide who to help first, in plain words.
+  // It names the kinds of information, not the sensitive details themselves (like how much rent is owed).
+  function whatWeKnow(home) {
+    const K = C.know;
+    const items = [
+      K.epc(home.epc),
+      K.built(home.built),
+      K.jobs(home.condensationJobs, home.leakJobs),
+      K.arrears, K.fuel, K.gas, K.contact, K.age,
+      home.supportNotes.length ? (home.consent ? K.notesYes : K.notesNo) : "",
+      K.reports
+    ].filter(Boolean);
+    return '<section class="know"><h2>' + C.knowHeading + "</h2>" +
+      "<p>" + C.knowIntro + "</p>" +
+      "<ul>" + items.map((i) => "<li>" + i + "</li>").join("") + "</ul>" +
+      "<p>" + C.knowChange + "</p></section>";
   }
 
   function progress(id) {
