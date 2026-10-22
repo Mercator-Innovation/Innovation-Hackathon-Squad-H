@@ -117,11 +117,14 @@
     return daysLeft < 0 ? C.awaab.late(-daysLeft) : C.awaab.left(daysLeft);
   }
 
+  function awaabText(status) {
+    return C.awaab.cardLabel + ": " + C.awaab.steps[status.next.key].label + ", " + daysText(status.next.daysLeft) +
+      (status.next.delay ? " (" + C.awaab.delayedTag + ")" : "");
+  }
+
   function awaabBadge(status) {
     return '<span class="badge awaab' + (status.late ? " is-late" : "") + '">' +
-      (status.late ? '<span aria-hidden="true">! </span>' : "") + C.awaab.cardLabel + ": " +
-      C.awaab.steps[status.next.key].label + ", " + daysText(status.next.daysLeft) +
-      (status.next.delay ? " (" + C.awaab.delayedTag + ")" : "") + "</span>";
+      (status.late ? '<span aria-hidden="true">! </span>' : "") + awaabText(status) + "</span>";
   }
 
   function renderAwaab(c) {
@@ -257,8 +260,18 @@
         (unchecked.some((r) => r.source === "tenant") ? C.tenantReportToCheck : C.replyToCheck) + "</span>";
       const clock = awaabStatus(a.home.id);
       const shortReasons = a.reasons.slice(0, 2).join("; ") + (a.reasons.length > 2 ? "; and more" : "");
+      // Screen readers and voice control get a short name: the address first (as seen on the card),
+      // then the risk, any deadline and status. The reasons are read in the home's details instead.
+      const spoken = [
+        a.home.address,
+        C.levels[a.level].label + ": " + C.levels[a.level].hint,
+        clock ? awaabText(clock) : "",
+        s.dismissed ? C.dismissedLabel : s.history.some((item) => item.type) ? C.actionTakenLabel : "",
+        unchecked.length ? (unchecked.some((r) => r.source === "tenant") ? C.tenantReportToCheck : C.replyToCheck) : ""
+      ].filter(Boolean).join(". ");
       return '<li><button type="button" class="home-card level-' + a.level + (s.dismissed ? " is-dismissed" : "") +
-        '" data-id="' + a.home.id + '"' + (a.home.id === selectedId ? ' aria-current="true"' : "") + ">" +
+        '" data-id="' + a.home.id + '" aria-label="' + escapeHtml(spoken) + '"' +
+        (a.home.id === selectedId ? ' aria-current="true"' : "") + ">" +
         '<span class="card-top"><span class="card-address">' + a.home.address + "</span>" +
         '<span class="card-ref">' + a.home.id + ", " + a.home.area + "</span></span>" +
         "<span>" + badge(a.level) + status + replyBadge + "</span>" +
@@ -350,6 +363,7 @@
 
     detailEl.innerHTML =
       '<h2 id="detail-heading" tabindex="-1">' + h.address + "</h2>" +
+      '<p><a href="#home-list" class="back-link" id="back-to-list">' + C.backToList + "</a></p>" +
       "<p>" + badge(a.level) + "</p>" +
       (s.awaab ? renderAwaab(s.awaab) : "") +
 
@@ -413,6 +427,18 @@
 
   function wireDetail(home) {
     const s = homeState(home.id);
+
+    // Back to the list: focus returns to this home's card, so the next one is a Tab away.
+    document.getElementById("back-to-list").addEventListener("click", (event) => {
+      event.preventDefault();
+      const card = listEl.querySelector('.home-card[data-id="' + home.id + '"]');
+      if (card) {
+        card.focus();
+        card.scrollIntoView({ block: "center" });
+      } else {
+        listEl.focus();
+      }
+    });
 
     const actionForm = document.getElementById("action-form");
     actionForm.addEventListener("submit", (event) => {

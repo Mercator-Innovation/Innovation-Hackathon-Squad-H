@@ -29,7 +29,8 @@ window.CONTENT = {
   urgencyLabel: "How urgent",
   urgencies: ["Today", "This week", "This month"],
   confirmCheck: "I've checked the reasons and I'm making this decision.",
-  confirmButton: "Book",
+  confirmButton: "Book these actions",
+  backToList: "Back to the list of homes",
   confirmNeeded: "Tick the box to say you've checked the reasons.",
   chooseAction: "Choose at least one action.",
 
