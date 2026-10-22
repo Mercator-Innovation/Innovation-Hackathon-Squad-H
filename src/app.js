@@ -217,6 +217,16 @@
     const level = levelFilter.value;
     const search = searchFilter.value.trim().toLowerCase();
 
+    // If a dismissed home gets an Awaab's Law clock (say, from a tenant's report), it goes back on the list.
+    assessed.forEach((a) => {
+      const s = homeState(a.home.id);
+      if (s.dismissed && awaabStatus(a.home.id)) {
+        s.dismissed = null;
+        s.history.push({ label: C.dismissUndoneByClock, date: formatDate(startOfToday()) });
+        saveState();
+      }
+    });
+
     const visible = assessed
       .filter((a) => {
         const dismissed = !!homeState(a.home.id).dismissed;
@@ -366,9 +376,12 @@
         '<button type="submit" class="button secondary">' + C.replyButton + "</button>" +
       "</form>";
 
+    // A home with an Awaab's Law clock running can't be dismissed: the legal deadlines still apply.
     const dismissBlock = s.dismissed
       ? '<p class="success">' + escapeHtml(C.dismissed(s.dismissed)) + "</p>" +
         '<button type="button" class="button secondary" id="undo-dismiss">' + C.undoDismiss + "</button>"
+      : awaabStatus(h.id)
+      ? '<p class="note">' + C.dismissBlocked + "</p>"
       : '<form id="dismiss-form" novalidate>' +
           '<div class="field"><label for="dismiss-reason">' + C.dismissLabel + "</label>" +
           '<p class="note" id="dismiss-hint">' + C.dismissHint + "</p>" +
@@ -611,6 +624,7 @@
         event.preventDefault();
         const reason = document.getElementById("dismiss-reason").value.trim();
         if (!reason) return showError(document.getElementById("dismiss-error"), C.dismissNeeded);
+        if (awaabStatus(home.id)) return showError(document.getElementById("dismiss-error"), C.dismissBlocked);
         s.dismissed = reason;
         saveState();
         renderList();
