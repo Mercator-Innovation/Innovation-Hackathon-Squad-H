@@ -10,14 +10,14 @@ hopes: [see-claude]
 feeling: excited
 badges: [claude-master]
 # At 19:00
-worked_on: []
-outside_usual_job:
-got_in_way: []
-ai_use_after:
-enjoyed:
-pace:
-worked_best: []
-again:
+worked_on: [code, design, content, research]
+outside_usual_job: a-lot
+got_in_way: [squad, time]
+ai_use_after: 3
+enjoyed: loved
+pace: right
+worked_best: [building, screen-badges, setup]
+again: definitely
 # In the week after
 specialist:
 helped_squad: []
@@ -49,15 +49,15 @@ ai_use_week_after:
 - 18:05 working as a squad: Connor and I often changed the same files (app.js, content.js) at the same time, but sharing small changes often meant almost everything merged cleanly. Telling each other what we were changing helped.
 
 ## At 19:00
-- What I worked on: <answers>
-- How much of it was outside my usual job: <answer>
-- What got in the way: <answers>
-- How much I'd use AI tools in my work now: <answer>
-- How much I enjoyed the hackathon: <answer>
-- The pace of the afternoon: <answer>
-- What worked best for me: <answers>
-- Would I take part in another: <answer>
-- One thing to change next time: <in my words>
+- What I worked on: Code or features; The design or the look; The words people see; Research or finding things out
+- How much of it was outside my usual job: A lot
+- What got in the way: Working as a squad (clashes, waiting); Not enough time
+- How much I'd use AI tools in my work now: Most weeks
+- How much I enjoyed the hackathon: Loved it
+- The pace of the afternoon: About right
+- What worked best for me: Building with Claude; The shared screen and badges; The setup before the day
+- Would I take part in another: Definitely
+- One thing to change next time: The presentation time was really short. If that is extended to 5 mins for each squad to showcase everything built and the thought process and design thinking that went into it, that will be great.
 
 ## In the week after
 - Did I still need a human specialist: <answer>, for <what>
