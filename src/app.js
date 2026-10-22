@@ -394,13 +394,21 @@
     if (moveFocus) {
       const heading = document.getElementById("detail-heading");
       heading.focus();
-      if (window.matchMedia("(max-width: 899px)").matches) heading.scrollIntoView({ behavior: "smooth" });
+      if (window.matchMedia("(max-width: 899px)").matches) {
+        // No smooth scrolling for people who've asked their device to reduce motion.
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        heading.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+      }
     }
   }
 
+  // Errors are alerts, so screen readers read them out as soon as they appear.
+  // Clearing first means the same error is read out again if it happens twice in a row.
   function showError(el, message) {
-    el.textContent = message;
+    el.setAttribute("role", "alert");
+    el.textContent = "";
     el.hidden = !message;
+    if (message) setTimeout(() => { el.textContent = message; }, 50);
   }
 
   function wireDetail(home) {
