@@ -4,9 +4,9 @@
 
 **Repo:** Innovation-Hackathon-Squad-H
 **Squad name:** Mould Breakers
-**Challenge:** _chosen on the day_
-**Why we chose it:** _(one or two sentences)_
-**The idea:** _(one or two sentences, agreed on the day: who it's for, when they need it, and what it does)_
+**Challenge:** 1, Healthier homes: finding tenants at risk before they get ill
+**Why we chose it:** Our early research on Awaab's Law and what Cloch says made it a real, urgent problem, and we want to reach the tenants who never get in touch, before they get ill. We could also picture a clear first version to build today.
+**The idea:** A board for Cloch housing officers that shows which homes to help first, before anyone gets ill, by bringing together signals Cloch already has (the home's condition, money worries, homes gone quiet, and support notes, the last only with consent). Each flag gives its reasons in plain words, and the officer chooses an action (energy advice, a damp check that starts the Awaab's Law clock, a wellbeing call, or a letter or questionnaire), with a person always making the final call.
 
 ## Members
 
