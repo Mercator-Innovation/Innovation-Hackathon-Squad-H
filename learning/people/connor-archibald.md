@@ -29,6 +29,17 @@ ai_use_week_after:
 
 ## During
 <!-- Claude adds one line per moment: prompts that worked (word for word), dead ends, surprises, things done outside my usual job, what made working as a squad easier or harder -->
+- 15:56 surprise: I was surprised how well it build it in one prompt. The prompt was "can i grab and build number 1 from your list please", and it built the full Awaab's Law clock (four deadlines, days left on each card, ticking off each step), tested it and shared it.
+  - What's still missing or rough, from my QA eye:
+    - Bank holidays aren't counted, so a deadline near a holiday could be a day or more out.
+    - There's no way to record a delay (the reason, a new date, the interim steps), though the law asks landlords to do this.
+    - Only a damp check starts the clock. A questionnaire reply that mentions damp or mould should start it the same day, as Glory decided, but replies don't exist yet.
+    - Compensation for a missed deadline is mentioned, but not worked out.
+    - A step marked done by mistake can't be undone.
+    - A home can be dismissed while its legal clock is still running. That should be blocked, or at least warned.
+    - What officers do is saved only in that browser, so the shared screen and each laptop show different things.
+    - The timescales are our reading of the guidance and law-firm summaries, not legal advice. Emergencies aren't covered.
+    - Not yet tested with a screen reader.
 
 ## At 19:00
 - What I worked on: <answers>
