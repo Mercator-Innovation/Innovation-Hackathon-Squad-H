@@ -1,7 +1,7 @@
 // The words people see. Change them here without touching app.js.
 window.CONTENT = {
   serviceName: "Healthier homes board",
-  banner: "Prototype with made-up homes. Not a real service and no real tenants.",
+  banner: "Prototype with made-up homes. Not a real service and no real tenants. Tenant reports reach the board only in this same browser.",
   listHeading: "Homes to help first",
   listIntro: "Homes most at risk come first. Each one says why. You decide what happens.",
   filterLevel: "Show",
@@ -223,7 +223,7 @@ window.CONTENT = {
     errorSummary: "There's a problem",
     sendButton: "Send",
     doneTitle: "Thanks, we've got it",
-    doneIntro: "Your housing officer can see your report now.",
+    doneIntro: "Your housing officer can see your report now. (In this prototype, open the board in this same browser to see it.)",
     nextHeading: "What happens next",
     nextLook: (date) => "Someone will come and look at your home by " + date + ".",
     nextWrite: "Within 3 working days after that, we'll tell you what we found.",
