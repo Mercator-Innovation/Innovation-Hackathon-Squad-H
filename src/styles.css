@@ -268,6 +268,29 @@ input.short { max-width: 10rem; }
 .conditional { border-left: 4px solid var(--border); padding-left: 1rem; margin: 0.5rem 0 1rem; }
 .check.consent { background: var(--background); padding: 0.5rem; border-radius: var(--radius); }
 #check-result:focus { outline: none; }
+/* The map, cold snap and sensors */
+.map-page { max-width: 960px; margin: 0 auto; padding: 1rem; }
+.map-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.5rem; margin: 1rem 0; }
+.map-svg { display: block; width: 100%; height: auto; }
+.map-area { fill: var(--background); stroke: var(--border); stroke-width: 2; }
+.map-area-name { font: 700 18px var(--font); fill: var(--text); }
+.map-street { stroke: var(--control-border, #6b766f); stroke-width: 6; stroke-linecap: round; opacity: 0.35; }
+.map-street-name { font: 13px var(--font); fill: var(--text-muted); }
+.map-num { font: 11px var(--font); fill: var(--text-muted); }
+.mk { stroke: #ffffff; stroke-width: 2; }
+.mk-high { fill: var(--high); }
+.mk-medium, .mk-check { fill: var(--medium); }
+.mk-low { fill: var(--low); }
+.mk-none { fill: var(--none); }
+.mk-ring { fill: none; stroke: var(--brand); stroke-width: 3; }
+.mk-sensor { fill: var(--brand); }
+.map-svg a:focus-visible { outline: none; }
+.map-svg a:focus-visible .mk { stroke: var(--text); stroke-width: 4; }
+.map-legend { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
+.map-legend li { display: flex; align-items: center; gap: 0.4rem; }
+.cold-banner { border-left: 5px solid var(--low); background: var(--low-bg); }
+.sensor-flag { color: var(--high); font-weight: 600; }
+
 /* The manager summary */
 .manager { max-width: 960px; margin: 0 auto; padding: 1rem; }
 .manager section { margin-top: 1.75rem; }
