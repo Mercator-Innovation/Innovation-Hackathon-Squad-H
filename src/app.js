@@ -64,6 +64,68 @@
   const { addWorkingDays, startOfToday, toISO, fromISO, newCase, awaabSteps, lastDoneStep, undoStep, compensationEstimate } = window.Clock;
 
   // The most urgent open step, or null when the clock isn't running.
+  // ---------- Tenants who've gone quiet (rules in quiet.js) ----------
+
+  function remindersState() {
+    try {
+      return JSON.parse(localStorage.getItem("healthier-homes-reminders")) || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function quietStatus(id) {
+    const home = homes.find((h) => h.id === id);
+    return window.Quiet.check(home, homeState(id), remindersState(), window.DATA.contactPreferences, startOfToday());
+  }
+
+  function quietWhen(q) {
+    return q.daysLeft <= 0 ? (q.daysLeft < 0 ? daysText(q.daysLeft) : C.quiet.dueNow) : daysText(q.daysLeft);
+  }
+
+  function quietBadge(q) {
+    return '<span class="badge quiet' + (q.daysLeft < 0 ? " is-late" : "") + '">' +
+      C.quiet.card(C.quiet.methods[q.method], quietWhen(q)) + "</span>";
+  }
+
+  function renderQuiet(q) {
+    const reasonText = (r) => r.key === "gas" ? C.quiet.reasons.gas : C.quiet.reasons[r.key](r.n);
+    const steps = window.Quiet.LADDER.map((method, i) => {
+      const tried = q.tries[i];
+      const status = tried
+        ? '<span class="clock-done">' + escapeHtml(C.quiet.tried(formatDate(fromISO(tried.date)), C.quiet.results[tried.result])) + "</span>"
+        : method === q.method && !q.escalate
+        ? '<span class="' + (q.daysLeft < 0 ? "clock-late" : "clock-due") + '">' + C.quiet.nextLabel + ": " +
+          (q.daysLeft <= 0 ? quietWhen(q) : C.quiet.dueOn(formatDate(q.due)) + " (" + daysText(q.daysLeft) + ")") + "</span>"
+        : "";
+      return "<li><strong>" + C.quiet.methods[method] + "</strong>" + (status ? "<br>" + status : "") + "</li>";
+    }).join("");
+    const methodOptions = window.Quiet.LADDER.map((m) => (
+      '<option value="' + m + '"' + (m === q.method ? " selected" : "") + ">" + C.quiet.methods[m] + "</option>"
+    )).join("");
+    const results = Object.keys(C.quiet.results).map((key) => (
+      '<label class="radio"><input type="radio" name="quiet-result" value="' + key + '"><span>' + C.quiet.results[key] + "</span></label>"
+    )).join("");
+    return '<div class="quiet-box" id="quiet-box">' +
+      "<h3>" + C.quiet.heading + "</h3>" +
+      '<p class="note">' + C.quiet.intro + "</p>" +
+      "<p><strong>" + C.quiet.whyHeading + "</strong></p>" +
+      '<ul class="reasons">' + q.reasons.map((r) => "<li>" + reasonText(r) + "</li>").join("") + "</ul>" +
+      '<ol class="clock-steps">' + steps + "</ol>" +
+      (q.escalate ? '<p class="warning">' + C.quiet.escalate + "</p>" : "") +
+      '<form id="quiet-form" novalidate>' +
+        '<div class="field"><label for="quiet-method">' + C.quiet.methodLabel + "</label>" +
+          '<select id="quiet-method">' + methodOptions + "</select></div>" +
+        "<fieldset><legend>" + C.quiet.resultLegend + "</legend>" + results + "</fieldset>" +
+        '<div class="field"><label for="quiet-note">' + C.quiet.noteLabel + "</label>" +
+          '<p class="note" id="quiet-note-hint">' + C.quiet.noteHint + "</p>" +
+          '<input type="text" id="quiet-note" aria-describedby="quiet-note-hint"></div>' +
+        '<p class="error" id="quiet-error" hidden></p>' +
+        '<button type="submit" class="button secondary">' + C.quiet.logButton + "</button>" +
+      "</form>" +
+      "</div>";
+  }
+
   function awaabStatus(id) {
     const c = homeState(id).awaab;
     if (!c) return null;
@@ -237,6 +299,7 @@
         if (area !== "all" && a.home.area !== area) return false;
         if (booked !== "all" && bookedUrgency(a.home.id) !== booked) return false;
         if (level === "awaab") return !!awaabStatus(a.home.id);
+        if (level === "quiet") return !!quietStatus(a.home.id);
         if (level === "dismissed") return dismissed;
         if (level !== "all" && (dismissed || a.level !== level)) return false;
         return true;
@@ -244,6 +307,8 @@
       .sort((a, b) => {
         // In the Awaab's Law view, the nearest deadline comes first.
         if (level === "awaab") return awaabStatus(a.home.id).next.daysLeft - awaabStatus(b.home.id).next.daysLeft;
+        // In the check-in view, the most overdue contact comes first.
+        if (level === "quiet") return quietStatus(a.home.id).daysLeft - quietStatus(b.home.id).daysLeft;
         const da = homeState(a.home.id).dismissed ? 1 : 0;
         const db = homeState(b.home.id).dismissed ? 1 : 0;
         // Missed legal deadlines come first, most overdue at the top: the law says act now.
@@ -265,9 +330,14 @@
       const status = awaabStatus(a.home.id);
       if (status) { running++; if (status.late) late++; }
     });
+    const quietCount = assessed.filter((a) => quietStatus(a.home.id)).length;
     summaryEl.textContent = visible.length + " of " + assessed.length + " homes shown. " +
       counts.high + " high, " + counts.medium + " medium, " + counts.low + " low. " +
-      C.awaab.summaryCount(running, late);
+      C.awaab.summaryCount(running, late) + " " + C.quiet.summaryCount(quietCount);
+    // A nudge at the top of the list, unless the officer is already looking at them.
+    const banner = document.getElementById("quiet-banner");
+    banner.hidden = !quietCount || level === "quiet";
+    document.getElementById("quiet-banner-text").textContent = C.quiet.banner(quietCount);
 
     if (!visible.length) {
       listEl.innerHTML = '<li class="note">' + C.noResults + "</li>";
@@ -283,6 +353,7 @@
       const replyBadge = !unchecked.length ? "" : '<span class="badge reply">' +
         reportLabel(unchecked) + "</span>";
       const clock = awaabStatus(a.home.id);
+      const quiet = quietStatus(a.home.id);
       const lv = shownLevel(a);
       const shortReasons = a.reasons.slice(0, 2).join("; ") + (a.reasons.length > 2 ? "; and more" : "");
       // Screen readers and voice control get a short name: the address first (as seen on the card),
@@ -291,6 +362,7 @@
         a.home.address,
         C.levels[lv].label + ": " + C.levels[lv].hint,
         clock ? awaabText(clock) : "",
+        quiet ? C.quiet.card(C.quiet.methods[quiet.method], quietWhen(quiet)) : "",
         s.dismissed ? C.dismissedLabel : s.history.some((item) => item.type) ? C.actionTakenLabel : "",
         unchecked.length ? reportLabel(unchecked) : ""
       ].filter(Boolean).join(". ");
@@ -301,6 +373,7 @@
         '<span class="card-ref">' + a.home.id + ", " + a.home.area + "</span></span>" +
         "<span>" + badge(lv) + status + replyBadge + "</span>" +
         (clock ? '<span class="card-clock">' + awaabBadge(clock) + "</span>" : "") +
+        (quiet ? '<span class="card-clock">' + quietBadge(quiet) + "</span>" : "") +
         '<span class="card-reasons">' + (shortReasons || C.noReasons) + "</span>" +
         "</button></li>";
     }).join("");
@@ -315,6 +388,12 @@
   });
 
   levelFilter.addEventListener("change", renderList);
+  document.getElementById("quiet-banner-button").textContent = C.quiet.bannerButton;
+  document.getElementById("quiet-banner-button").addEventListener("click", () => {
+    levelFilter.value = "quiet";
+    renderList();
+    listEl.focus();
+  });
   searchFilter.addEventListener("input", renderList);
   areaFilter.addEventListener("change", renderList);
   bookedFilter.addEventListener("change", renderList);
@@ -426,6 +505,7 @@
       "<p>" + badge(shownLevel(a)) + "</p>" +
       (shownLevel(a) === "check" ? '<p class="note">' + C.checkLevelNote + "</p>" : "") +
       (s.awaab ? renderAwaab(s.awaab) : "") +
+      (quietStatus(h.id) ? renderQuiet(quietStatus(h.id)) : "") +
 
       "<h3>" + C.reasonsHeading + "</h3>" + reasons +
       (a.unusedNotes ? '<p class="note">' + C.notesNotUsed(a.unusedNotes) + "</p>" : "") +
@@ -488,6 +568,31 @@
 
   function wireDetail(home) {
     const s = homeState(home.id);
+
+    // Logging a try on the contact ladder.
+    const quietForm = document.getElementById("quiet-form");
+    if (quietForm) {
+      quietForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const chosen = quietForm.querySelector('input[name="quiet-result"]:checked');
+        if (!chosen) return showError(document.getElementById("quiet-error"), C.quiet.resultNeeded);
+        const method = document.getElementById("quiet-method").value;
+        const note = document.getElementById("quiet-note").value.trim();
+        s.contacts = s.contacts || [];
+        s.contacts.push({ date: toISO(startOfToday()), method, result: chosen.value, note });
+        s.history.push({
+          label: C.quiet.logged(C.quiet.methods[method], C.quiet.results[chosen.value]),
+          date: formatDate(startOfToday()),
+          awaab: note
+        });
+        saveState();
+        renderList();
+        renderDetail(false);
+        const box = document.getElementById("quiet-box") || document.getElementById("detail-heading");
+        box.setAttribute("tabindex", "-1");
+        box.focus();
+      });
+    }
 
     // Back to the list: focus returns to this home's card, so the next one is a Tab away.
     document.getElementById("back-to-list").addEventListener("click", (event) => {
