@@ -241,6 +241,23 @@ th { background: var(--surface-warm); }
   }
 }
 .conditional { border-left-color: var(--accent); border-left-width: 5px; }
+/* The optional questions on the tenant form: a clear box that opens when tapped. */
+details.more {
+  margin: 1.5rem 0;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-warm);
+}
+details.more > summary {
+  padding: 1rem 1.25rem;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  border-radius: var(--radius);
+}
+details.more > summary:hover { background: var(--brand-tint); }
+details.more[open] > summary { border-bottom: 1px solid var(--border); border-radius: var(--radius) var(--radius) 0 0; }
+details.more > :not(summary) { margin-left: 1.25rem; margin-right: 1.25rem; }
+details.more > :last-child { margin-bottom: 1.25rem; }
 .check.consent { background: var(--brand-tint); border-radius: var(--radius-small); padding: 0.75rem; }
 .tenant-nav a { text-decoration: none; padding: 0.35rem 0.9rem; border-radius: 999px; }
 .tenant-nav a:hover { background: var(--brand-tint); }
