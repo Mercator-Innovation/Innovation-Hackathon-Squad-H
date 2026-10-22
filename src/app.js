@@ -32,6 +32,10 @@
     const ticked = new Set();
     replies.filter((r) => r.checked).forEach((r) => r.items.forEach((i) => ticked.add(i)));
     ticked.forEach((i) => add(C.letterPoints[i], C.reasons.reply(C.letterItems[i])));
+    // Who's at risk at home, from a tenant's report. Only ever saved with their consent.
+    const atRisk = new Set();
+    replies.filter((r) => r.checked).forEach((r) => (r.atRisk || []).forEach((who) => atRisk.add(who)));
+    atRisk.forEach((who) => add(2, C.reasons.atRisk(who)));
 
     // Support notes count only with the tenant's consent.
     if (home.consent && home.supportNotes.length) {
@@ -307,8 +311,11 @@
       ? '<ul class="reasons">' + a.reasons.map((r) => "<li>" + r + "</li>").join("") + "</ul>"
       : '<p>' + C.noReasons + "</p>";
 
+    // A tenant who asked for help with energy bills has energy advice ticked ready.
+    const wantsEnergy = (s.replies || []).some((r) => !r.checked && r.energyHelp);
     const actionOptions = Object.keys(C.actions).map((key) => (
-      '<label class="radio"><input type="checkbox" name="action" value="' + key + '"><span>' +
+      '<label class="radio"><input type="checkbox" name="action" value="' + key + '"' +
+      (key === "energy" && wantsEnergy ? " checked" : "") + "><span>" +
       C.actions[key].label + "<small>" + C.actions[key].team + "</small></span></label>"
     )).join("");
 
@@ -332,8 +339,11 @@
       replies.map((r, index) => (
         '<div class="letter reply-received"><p><strong>' +
           (r.source === "tenant" ? C.tenantReportReceived : C.replyReceived)(formatDate(fromISO(r.date))) + "</strong></p>" +
-          "<ul>" + r.items.map((i) => "<li>" + C.letterItems[i] + "</li>").join("") + "</ul>" +
-          (r.note ? '<p class="tenant-note">' + C.tenantNoteLabel + "“" + escapeHtml(r.note) + "”</p>" : "") +
+          (r.items.length ? "<ul>" + r.items.map((i) => "<li>" + C.letterItems[i] + "</li>").join("") + "</ul>" : "") +
+          (r.reporter ? '<p class="tenant-note">' + escapeHtml(C.reportOther(r.reporter.relation, r.reporter.knows)) + "</p>" : "") +
+          (r.atRisk && r.atRisk.length ? '<p class="tenant-note">' + C.reportAtRisk + escapeHtml(r.atRisk.join("; ")) + "</p>" : "") +
+          (r.energyHelp ? '<p class="tenant-note">' + C.reportEnergy + "</p>" : "") +
+          (r.note ?'<p class="tenant-note">' + C.tenantNoteLabel + "“" + escapeHtml(r.note) + "”</p>" : "") +
           (r.contact ? '<p class="tenant-note">' + C.tenantContactLabel + escapeHtml(r.contact.toLowerCase()) + "</p>" : "") +
           (r.checked
             ? '<p class="success">' + C.replyChecked + "</p>"
