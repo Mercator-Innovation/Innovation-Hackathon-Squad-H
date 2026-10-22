@@ -355,6 +355,12 @@
           (r.energyHelp ? '<p class="tenant-note">' + C.reportEnergy + "</p>" : "") +
           (r.note ?'<p class="tenant-note">' + C.tenantNoteLabel + "“" + escapeHtml(r.note) + "”</p>" : "") +
           (r.contact ? '<p class="tenant-note">' + C.tenantContactLabel + escapeHtml(r.contact.toLowerCase()) + "</p>" : "") +
+          (r.visitTimes && r.visitTimes.length ? '<p class="tenant-note">' + C.reportVisitTimes + escapeHtml(r.visitTimes.join(", ").toLowerCase()) + "</p>" : "") +
+          (r.visitNeeds && r.visitNeeds.length || r.visitNote
+            ? '<p class="tenant-note">' + C.reportVisitNeeds + escapeHtml((r.visitNeeds || []).concat(r.visitNote ? ["“" + r.visitNote + "”"] : []).join("; ")) + "</p>" : "") +
+          // Only a photo the tenant's page made (a JPEG data URL) is shown.
+          (typeof r.photo === "string" && r.photo.startsWith("data:image/jpeg;base64,")
+            ? '<img class="photo" src="' + r.photo + '" alt="' + C.reportPhotoAlt + '">' : "") +
           (r.checked
             ? '<p class="success">' + C.replyChecked + "</p>"
             : '<p><button type="button" class="button secondary" data-reply="' + index + '">' + C.replyCheckButton + "</button></p>") +

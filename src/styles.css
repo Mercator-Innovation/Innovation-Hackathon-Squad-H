@@ -268,3 +268,5 @@ input.short { max-width: 10rem; }
 .conditional { border-left: 4px solid var(--border); padding-left: 1rem; margin: 0.5rem 0 1rem; }
 .check.consent { background: var(--background); padding: 0.5rem; border-radius: var(--radius); }
 #check-result:focus { outline: none; }
+img.photo { display: block; max-width: 100%; max-height: 20rem; margin: 0.5rem 0; border-radius: var(--radius); }
+input[type="file"] { font: inherit; max-width: 100%; }

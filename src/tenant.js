@@ -70,7 +70,8 @@
 
   function nav(current) {
     const link = (hash, label) => '<a href="' + hash + '"' + (current === hash ? ' aria-current="page"' : "") + ">" + label + "</a>";
-    return '<nav class="tenant-nav" aria-label="Pages">' + link("#report", T.navReport) + link("#check", T.navCheck) + "</nav>";
+    return '<nav class="tenant-nav" aria-label="Pages">' + link("#report", T.navReport) + link("#check", T.navCheck) +
+      link("#help", T.navHelp) + "</nav>";
   }
 
   const radios = (name, options) => options.map((option) => (
@@ -118,11 +119,28 @@
           '<p class="note" id="note-hint">' + T.noteHint + "</p>" +
           '<textarea id="note" rows="3" aria-describedby="note-hint"></textarea>' +
         "</div>" +
+        '<div class="field">' +
+          '<label for="photo">' + T.photoLabel + "</label>" +
+          '<p class="note" id="photo-hint">' + T.photoHint + "</p>" +
+          '<p class="error" id="photo-error" hidden></p>' +
+          '<input type="file" id="photo" accept="image/*" aria-describedby="photo-hint photo-error">' +
+          '<div id="photo-preview" hidden><img id="photo-img" alt="' + T.photoAlt + '" class="photo">' +
+            '<p><button type="button" class="button secondary" id="photo-remove">' + T.photoRemove + "</button></p></div>" +
+        "</div>" +
         '<fieldset id="risk" aria-describedby="risk-hint risk-error"><legend>' + T.riskLegend + "</legend>" +
           '<p class="note" id="risk-hint">' + T.riskHint + "</p>" +
           '<p class="error" id="risk-error" hidden></p>' + checks("risk", T.riskOptions) +
           '<label class="check consent"><input type="checkbox" id="risk-consent"><span>' + T.riskConsent + "</span></label>" +
         "</fieldset>" +
+        '<fieldset aria-describedby="visit-hint"><legend>' + T.visitLegend + "</legend>" +
+          '<p class="note" id="visit-hint">' + T.visitHint + "</p>" + checks("visit", T.visitTimes) +
+        "</fieldset>" +
+        "<fieldset><legend>" + T.needsLegend + "</legend>" + checks("needs", T.needsOptions) + "</fieldset>" +
+        '<div class="field">' +
+          '<label for="needs-note">' + T.needsNoteLabel + "</label>" +
+          '<p class="note" id="needs-note-hint">' + T.needsNoteHint + "</p>" +
+          '<input type="text" id="needs-note" aria-describedby="needs-note-hint">' +
+        "</div>" +
         '<fieldset aria-describedby="energy-hint"><legend>' + T.energyLegend + "</legend>" +
           '<p class="note" id="energy-hint">' + T.energyHint + "</p>" +
           '<label class="check"><input type="checkbox" id="energy"><span>' + T.energyCheck + "</span></label>" +
@@ -146,6 +164,50 @@
       document.getElementById("ref-hint").textContent = other ? T.refHintOther : T.refHint;
     });
     form.addEventListener("submit", submit);
+
+    // The photo is made smaller before it's saved, so it fits in the browser's storage.
+    photo = null;
+    const input = document.getElementById("photo");
+    const preview = document.getElementById("photo-preview");
+    input.addEventListener("change", () => {
+      const file = input.files[0];
+      showError("photo", "");
+      if (!file) return;
+      shrinkPhoto(file).then((dataUrl) => {
+        photo = dataUrl;
+        document.getElementById("photo-img").src = dataUrl;
+        preview.hidden = false;
+      }).catch(() => {
+        photo = null;
+        input.value = "";
+        showError("photo", T.photoProblem);
+      });
+    });
+    document.getElementById("photo-remove").addEventListener("click", () => {
+      photo = null;
+      input.value = "";
+      preview.hidden = true;
+      input.focus();
+    });
+  }
+
+  let photo = null;
+
+  function shrinkPhoto(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, 800 / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        URL.revokeObjectURL(img.src);
+        resolve(canvas.toDataURL("image/jpeg", 0.7));
+      };
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
   }
 
   function submit(event) {
@@ -188,7 +250,11 @@
       note: document.getElementById("note").value.trim(), contact,
       reporter: other ? { relation, knows } : null,
       atRisk: consent ? risks.map((i) => T.riskOptions[i]) : [],
-      energyHelp: energy
+      energyHelp: energy,
+      visitTimes: ticked("visit").map((i) => T.visitTimes[i]),
+      visitNeeds: ticked("needs").map((i) => T.needsOptions[i]),
+      visitNote: document.getElementById("needs-note").value.trim(),
+      photo
     });
     // A report means the landlord is aware, so damp or mould starts the Awaab's Law clock today.
     const damp = problems.includes(0);
@@ -199,7 +265,13 @@
       entry.awaab = C.replyDampStarted(formatDate(addWorkingDays(today, 10)));
     }
     s.history.push(entry);
-    saveState(state);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      // The browser's storage is full, most likely because of the photo: send the report without it.
+      s.replies[s.replies.length - 1].photo = null;
+      saveState(state);
+    }
 
     renderDone({ damp, energy, other, ref: home.id });
   }
@@ -222,6 +294,7 @@
       "<h2>" + T.nextHeading + "</h2>" +
       "<ol>" + next.map((n) => "<li>" + n + "</li>").join("") + "</ol>" +
       (other ? "" : '<p><a href="#check">' + T.nextCheck(ref) + "</a></p>") +
+      '<p><a href="#help">' + T.helpLink + "</a></p>" +
       '<p class="note">' + T.emergency + "</p>" +
       '<p><a href="#report" id="again">' + T.again + "</a></p>";
     document.getElementById("page-heading").focus();
@@ -243,6 +316,7 @@
         '<button type="submit" class="button">' + T.checkButton + "</button>" +
       "</form>" +
       '<div id="check-result" tabindex="-1"></div>' +
+      '<p><a href="#help">' + T.helpLink + "</a></p>" +
       '<p class="note">' + T.checkPrivacy + "</p>";
 
     document.getElementById("check-form").addEventListener("submit", (event) => {
@@ -275,10 +349,29 @@
       (late ? '<p class="warning">' + escapeHtml(T.checkLate) + "</p>" : "");
   }
 
+  // ---------- Help and your rights ----------
+
+  function renderHelp() {
+    const list = (tag, entries) => "<" + tag + ">" + entries.map((e) => "<li>" + e + "</li>").join("") + "</" + tag + ">";
+    main.innerHTML = nav("#help") +
+      '<h1 id="page-heading" tabindex="-1">' + T.helpTitle + "</h1>" +
+      "<h2>" + T.waitHeading + "</h2>" +
+      "<p>" + T.waitIntro + "</p>" + list("ul", T.waitTips) +
+      "<h2>" + T.healthHeading + "</h2>" + list("ul", T.healthTips) +
+      "<h2>" + T.rightsHeading + "</h2>" +
+      "<p>" + T.rightsIntro + "</p>" + list("ol", T.rightsSteps) +
+      "<p>" + T.rightsLate + "</p>" +
+      "<h2>" + T.complainHeading + "</h2>" + list("ol", T.complainSteps) +
+      "<p>" + T.complainTip + "</p>" +
+      '<p class="note">' + T.moreHelp + "</p>" +
+      '<p class="note">' + T.emergency + "</p>";
+  }
+
   // ---------- Start ----------
 
   function route() {
     if (location.hash === "#check") renderCheck();
+    else if (location.hash === "#help") renderHelp();
     else renderForm();
     document.getElementById("page-heading").focus();
   }
