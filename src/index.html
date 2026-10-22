@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Healthier homes board (prototype)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to the list of homes</a>
+
+  <header class="site-header">
+    <p class="service-name" id="service-name"></p>
+    <p class="banner" id="banner"></p>
+  </header>
+
+  <main id="main" class="layout">
+    <section class="list-panel" aria-labelledby="list-heading">
+      <h1 id="list-heading"></h1>
+      <p id="list-intro" class="intro"></p>
+
+      <div class="filters">
+        <div class="field">
+          <label for="filter-level" id="filter-level-label"></label>
+          <select id="filter-level">
+            <option value="all">All homes</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+            <option value="none">No signs</option>
+            <option value="dismissed">Dismissed</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="filter-search" id="filter-search-label"></label>
+          <input type="search" id="filter-search" autocomplete="off">
+        </div>
+      </div>
+
+      <p id="summary" class="summary" aria-live="polite"></p>
+      <ul id="home-list" class="home-list"></ul>
+    </section>
+
+    <section class="detail-panel" id="detail" aria-label="Selected home">
+    </section>
+  </main>
+
+  <script src="data/homes.js"></script>
+  <script src="content.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
