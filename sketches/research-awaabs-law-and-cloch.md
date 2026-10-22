@@ -42,6 +42,41 @@ From news coverage in October 2026. Cloch's own website wouldn't load, and we fo
 
 **So what:** Cloch's problem is the tenant who never reports, and those are exactly the cases Awaab's Law deadlines never start for.
 
+## Our assumptions: how Cloch's tenants report damp and mould
+
+**We made these up.** We couldn't find how Cloch's tenants report problems, so these are realistic guesses for the prototype, based on what other landlords do. Check them with Cloch before relying on them.
+
+**How tenants report a problem**
+
+- **Phone** the office, Monday to Friday, 9 to 5. Most reports come this way.
+- **An online repair form** on Cloch's website.
+- **Email**, or **in person** at the office.
+- **Out of hours:** an emergency line run by the repairs contractor, for leaks and other emergencies only.
+- **Telling a housing officer** at a visit, which they may or may not log.
+- No app.
+
+**What happens next**
+
+- Staff log a repair job in the housing system and pass it to the repairs contractor.
+- Damp and mould aren't logged the same way every time: they might be "condensation", "leak" or "mould", so they're hard to count.
+- The Awaab's Law clock starts when the report is logged.
+
+**Why some tenants never report**
+
+- They fear being blamed for "lifestyle" causes, like drying clothes indoors.
+- They feel ashamed, or think damp is normal.
+- They don't know it's the landlord's job to fix it.
+- They can't easily phone or go online: no credit, no data, or not confident.
+- They're worried about rent arrears and keep their heads down.
+
+**Signs Cloch probably already has, but doesn't join up**
+
+- Rent arrears, or asking for fuel vouchers.
+- The same repair coming back, such as several condensation or leak jobs.
+- Notes from the energy advice service or tenancy visits.
+- No access at the annual gas safety check.
+- An older property, or a low energy rating (EPC).
+
 ## Sources
 
 - [Awaab's Law: Guidance for landlords in Scotland (gov.scot)](https://www.gov.scot/publications/awaabs-law-guidance-landlords-scotland/pages/2/)
