@@ -85,19 +85,138 @@
     ));
   }
 
+  // Working days are Monday to Friday. Bank holidays aren't counted yet.
+  function isWorkingDay(date) {
+    const day = date.getDay();
+    return day !== 0 && day !== 6;
+  }
+
   function addWorkingDays(date, days) {
     const result = new Date(date);
+    const step = days < 0 ? -1 : 1;
     let added = 0;
-    while (added < days) {
-      result.setDate(result.getDate() + 1);
-      const day = result.getDay();
-      if (day !== 0 && day !== 6) added++;
+    while (added < Math.abs(days)) {
+      result.setDate(result.getDate() + step);
+      if (isWorkingDay(result)) added++;
     }
     return result;
   }
 
+  function startOfToday() {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+
+  function toISO(date) {
+    return date.getFullYear() + "-" + String(date.getMonth() + 1).padStart(2, "0") + "-" +
+      String(date.getDate()).padStart(2, "0");
+  }
+
+  function fromISO(text) {
+    const [y, m, d] = text.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  // Working days from today until a date: negative once it has passed.
+  function workingDaysFromToday(due) {
+    const day = startOfToday();
+    const step = due >= day ? 1 : -1;
+    let count = 0;
+    while (day.getTime() !== due.getTime()) {
+      day.setDate(day.getDate() + step);
+      if (isWorkingDay(day)) count += step;
+    }
+    return count;
+  }
+
   function formatDate(date) {
     return date.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+  }
+
+  // ---------- The Awaab's Law clock ----------
+  // A case is { aware, investigated, substantial, summarySent, repairsStarted, repairsFinished },
+  // with dates as "YYYY-MM-DD" (null until that step happens).
+
+  function newCase() {
+    return { aware: toISO(startOfToday()), investigated: null, substantial: null,
+      summarySent: null, repairsStarted: null, repairsFinished: null };
+  }
+
+  function awaabSteps(c) {
+    const investigated = c.investigated && fromISO(c.investigated);
+    const noRepairs = c.substantial === false;
+    const steps = [
+      { key: "investigate", due: addWorkingDays(fromISO(c.aware), 10), done: c.investigated },
+      { key: "summary", due: investigated ? addWorkingDays(investigated, 3) : null, done: c.summarySent },
+      { key: "start", due: investigated && c.substantial ? addWorkingDays(investigated, 5) : null,
+        done: c.repairsStarted, notNeeded: noRepairs },
+      { key: "finish", due: c.repairsStarted ? addWorkingDays(fromISO(c.repairsStarted), 20) : null,
+        done: c.repairsFinished, notNeeded: noRepairs }
+    ];
+    steps.forEach((s) => {
+      s.open = !s.done && !s.notNeeded && !!s.due;
+      if (s.open) s.daysLeft = workingDaysFromToday(s.due);
+    });
+    return steps;
+  }
+
+  // The most urgent open step, or null when the clock isn't running.
+  function awaabStatus(id) {
+    const c = homeState(id).awaab;
+    if (!c) return null;
+    const open = awaabSteps(c).filter((s) => s.open).sort((a, b) => a.daysLeft - b.daysLeft);
+    if (!open.length) return null;
+    return { next: open[0], late: open.some((s) => s.daysLeft < 0) };
+  }
+
+  function daysText(daysLeft) {
+    return daysLeft < 0 ? C.awaab.late(-daysLeft) : C.awaab.left(daysLeft);
+  }
+
+  function awaabBadge(status) {
+    return '<span class="badge awaab' + (status.late ? " is-late" : "") + '">' +
+      (status.late ? '<span aria-hidden="true">! </span>' : "") + C.awaab.cardLabel + ": " +
+      C.awaab.steps[status.next.key].label + ", " + daysText(status.next.daysLeft) + "</span>";
+  }
+
+  function renderAwaab(c) {
+    const steps = awaabSteps(c);
+    const anyLate = steps.some((s) => s.open && s.daysLeft < 0);
+
+    const items = steps.map((s) => {
+      const step = C.awaab.steps[s.key];
+      let status;
+      if (s.done) status = '<span class="clock-done">' + C.awaab.done(formatDate(fromISO(s.done))) + "</span>";
+      else if (s.notNeeded) status = '<span class="note">' + C.awaab.notNeeded + "</span>";
+      else if (s.open) {
+        status = '<span class="' + (s.daysLeft < 0 ? "clock-late" : "clock-due") + '">' +
+          C.awaab.dueBy(formatDate(s.due)) + ": " + daysText(s.daysLeft) + "</span>";
+      } else status = '<span class="note">' + C.awaab.waiting + "</span>";
+      return "<li><strong>" + step.label + "</strong> <span class=\"note\">" + step.rule + "</span><br>" + status + "</li>";
+    }).join("");
+
+    const open = {};
+    steps.forEach((s) => { if (s.open) open[s.key] = true; });
+    let controls = "";
+    if (open.investigate) {
+      controls += '<fieldset><legend>' + C.awaab.substantialLegend + "</legend>" +
+        '<label class="radio"><input type="radio" name="substantial" value="yes"><span>' + C.awaab.substantialYes + "</span></label>" +
+        '<label class="radio"><input type="radio" name="substantial" value="no"><span>' + C.awaab.substantialNo + "</span></label>" +
+        "</fieldset>" +
+        '<p class="error" id="awaab-error" hidden></p>' +
+        '<p><button type="button" class="button secondary" data-step="investigate">' + C.awaab.markInvestigated + "</button></p>";
+    }
+    if (open.summary) controls += '<p><button type="button" class="button secondary" data-step="summary">' + C.awaab.markSummary + "</button></p>";
+    if (open.start) controls += '<p><button type="button" class="button secondary" data-step="start">' + C.awaab.markStarted + "</button></p>";
+    if (open.finish) controls += '<p><button type="button" class="button secondary" data-step="finish">' + C.awaab.markFinished + "</button></p>";
+
+    return '<div class="clock" id="awaab-clock">' +
+      "<h3>" + C.awaab.heading + "</h3>" +
+      '<p class="note">' + C.awaab.intro + " " + C.awaab.aware(formatDate(fromISO(c.aware))) + "</p>" +
+      '<ol class="clock-steps">' + items + "</ol>" +
+      (anyLate ? '<p class="warning">' + C.awaab.lateNote + "</p>" : "") +
+      (controls ? '<div id="awaab-controls">' + controls + "</div>" : '<p class="clock-done">' + C.awaab.closed + "</p>") +
+      "</div>";
   }
 
   function badge(level) {
@@ -121,23 +240,31 @@
     const visible = assessed
       .filter((a) => {
         const dismissed = !!homeState(a.home.id).dismissed;
+        if (search && !(a.home.address + " " + a.home.id).toLowerCase().includes(search)) return false;
+        if (level === "awaab") return !!awaabStatus(a.home.id);
         if (level === "dismissed") return dismissed;
         if (level !== "all" && (dismissed || a.level !== level)) return false;
-        if (search && !(a.home.address + " " + a.home.id).toLowerCase().includes(search)) return false;
         return true;
       })
       .sort((a, b) => {
+        // In the Awaab's Law view, the nearest deadline comes first.
+        if (level === "awaab") return awaabStatus(a.home.id).next.daysLeft - awaabStatus(b.home.id).next.daysLeft;
         const da = homeState(a.home.id).dismissed ? 1 : 0;
         const db = homeState(b.home.id).dismissed ? 1 : 0;
         return da - db || levelOrder[a.level] - levelOrder[b.level] || b.score - a.score;
       });
 
     const counts = { high: 0, medium: 0, low: 0 };
+    let running = 0;
+    let late = 0;
     assessed.forEach((a) => {
       if (!homeState(a.home.id).dismissed && counts[a.level] !== undefined) counts[a.level]++;
+      const status = awaabStatus(a.home.id);
+      if (status) { running++; if (status.late) late++; }
     });
     summaryEl.textContent = visible.length + " of " + assessed.length + " homes shown. " +
-      counts.high + " high, " + counts.medium + " medium, " + counts.low + " low.";
+      counts.high + " high, " + counts.medium + " medium, " + counts.low + " low. " +
+      C.awaab.summaryCount(running, late);
 
     if (!visible.length) {
       listEl.innerHTML = '<li class="note">' + C.noResults + "</li>";
@@ -149,12 +276,14 @@
       const status = s.dismissed
         ? '<span class="badge status">' + C.dismissedLabel + "</span>"
         : s.history.length ? '<span class="badge status">' + C.actionTakenLabel + "</span>" : "";
+      const clock = awaabStatus(a.home.id);
       const shortReasons = a.reasons.slice(0, 2).join("; ") + (a.reasons.length > 2 ? "; and more" : "");
       return '<li><button type="button" class="home-card level-' + a.level + (s.dismissed ? " is-dismissed" : "") +
         '" data-id="' + a.home.id + '"' + (a.home.id === selectedId ? ' aria-current="true"' : "") + ">" +
         '<span class="card-top"><span class="card-address">' + a.home.address + "</span>" +
         '<span class="card-ref">' + a.home.id + ", " + a.home.area + "</span></span>" +
         "<span>" + badge(a.level) + status + "</span>" +
+        (clock ? '<span class="card-clock">' + awaabBadge(clock) + "</span>" : "") +
         '<span class="card-reasons">' + (shortReasons || C.noReasons) + "</span>" +
         "</button></li>";
     }).join("");
@@ -195,8 +324,9 @@
 
     const history = s.history.length
       ? '<ul class="history">' + s.history.map((item) => (
-          "<li><strong>" + escapeHtml(item.label) + "</strong> (" + escapeHtml(item.team) + ", " +
-          escapeHtml(item.urgency.toLowerCase()) + "), booked " + escapeHtml(item.date) +
+          "<li><strong>" + escapeHtml(item.label) + "</strong>" +
+          (item.team ? " (" + escapeHtml(item.team) + ", " + escapeHtml(item.urgency.toLowerCase()) + ")" : "") +
+          ", " + escapeHtml(item.date) +
           (item.awaab ? ". " + escapeHtml(item.awaab) : "") + "</li>"
         )).join("") + "</ul>"
       : '<p class="note">' + C.noHistory + "</p>";
@@ -215,6 +345,7 @@
     detailEl.innerHTML =
       '<h2 id="detail-heading" tabindex="-1">' + h.address + "</h2>" +
       "<p>" + badge(a.level) + "</p>" +
+      (s.awaab ? renderAwaab(s.awaab) : "") +
 
       "<h3>" + C.reasonsHeading + "</h3>" + reasons +
       (a.unusedNotes ? '<p class="note">' + C.notesNotUsed(a.unusedNotes) + "</p>" : "") +
@@ -286,8 +417,16 @@
         urgency: document.getElementById("urgency").value,
         date: formatDate(today)
       };
-      // A damp check means the landlord is aware, so the Awaab's Law clock starts.
-      if (chosen.value === "damp") entry.awaab = C.awaabStarted(formatDate(addWorkingDays(today, 10)));
+      // A damp check means the landlord is aware, so the Awaab's Law clock starts,
+      // unless one is already running for this home.
+      if (chosen.value === "damp") {
+        if (awaabStatus(home.id)) {
+          entry.awaab = C.awaabAlreadyRunning;
+        } else {
+          s.awaab = newCase();
+          entry.awaab = C.awaabStarted(formatDate(addWorkingDays(startOfToday(), 10)));
+        }
+      }
 
       s.history.push(entry);
       saveState();
@@ -305,6 +444,33 @@
         document.getElementById("letter-preview").open = event.target.value === "letter";
       }
     });
+
+    // Ticking off Awaab's Law steps.
+    const controls = document.getElementById("awaab-controls");
+    if (controls) {
+      controls.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-step]");
+        if (!button) return;
+        const step = button.dataset.step;
+        const todayISO = toISO(startOfToday());
+        if (step === "investigate") {
+          const found = controls.querySelector('input[name="substantial"]:checked');
+          if (!found) return showError(document.getElementById("awaab-error"), C.awaab.substantialNeeded);
+          s.awaab.investigated = todayISO;
+          s.awaab.substantial = found.value === "yes";
+        }
+        if (step === "summary") s.awaab.summarySent = todayISO;
+        if (step === "start") s.awaab.repairsStarted = todayISO;
+        if (step === "finish") s.awaab.repairsFinished = todayISO;
+        s.history.push({ label: C.awaab.steps[step].label + ": done", date: formatDate(startOfToday()) });
+        saveState();
+        renderList();
+        renderDetail(false);
+        const clock = document.getElementById("awaab-clock");
+        clock.setAttribute("tabindex", "-1");
+        clock.focus();
+      });
+    }
 
     const dismissForm = document.getElementById("dismiss-form");
     if (dismissForm) {
@@ -331,6 +497,20 @@
   }
 
   // ---------- Start ----------
+
+  // Load the made-up cases already under way, unless an officer has changed them.
+  const seeds = window.DATA.awaabCases || {};
+  Object.keys(seeds).forEach((id) => {
+    const s = homeState(id);
+    if (s.awaab !== undefined) return;
+    const seed = seeds[id];
+    const daysAgo = (n) => (n == null ? null : toISO(addWorkingDays(startOfToday(), -n)));
+    s.awaab = {
+      aware: daysAgo(seed.aware), investigated: daysAgo(seed.investigated), substantial: seed.substantial,
+      summarySent: daysAgo(seed.summarySent), repairsStarted: daysAgo(seed.repairsStarted),
+      repairsFinished: daysAgo(seed.repairsFinished)
+    };
+  });
 
   document.getElementById("service-name").textContent = C.serviceName;
   document.getElementById("banner").textContent = C.banner;

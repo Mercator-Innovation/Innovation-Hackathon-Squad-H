@@ -195,4 +195,27 @@ summary { cursor: pointer; color: var(--brand); font-weight: 600; }
 .letter li::before { content: "☐ "; }
 
 .history { padding-left: 1.25rem; }
+
+/* The Awaab's Law clock */
+.card-clock { display: block; margin-top: 0.35rem; }
+.badge.awaab { color: var(--brand); background: #e3f1ef; }
+.badge.awaab.is-late { color: var(--high); background: var(--high-bg); }
+.clock {
+  border: 2px solid var(--brand);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  margin: 0.75rem 0;
+}
+.clock h3 { margin-top: 0; }
+.clock-steps { padding-left: 1.25rem; margin: 0.5rem 0; }
+.clock-steps li { margin-bottom: 0.5rem; }
+.clock-done { color: var(--good); font-weight: 600; }
+.clock-due { font-weight: 600; }
+.clock-late { color: var(--high); font-weight: 700; }
+.warning {
+  background: var(--high-bg);
+  color: var(--high);
+  border-left: 4px solid var(--high);
+  padding: 0.5rem 0.75rem;
+}
 .divider { border: 0; border-top: 1px solid var(--border); margin: 1.25rem 0; }
