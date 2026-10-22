@@ -140,7 +140,7 @@ window.CONTENT = {
   tenantHistory: "The tenant reported this online",
   tenantNoteLabel: "In their words: ",
   tenantContactLabel: "Get in touch by: ",
-  tenantPageLink: "Tenant's view: report damp or mould (opens in a new tab)",
+  tenantPageLink: "Tenant's view (opens in a new tab)",
   replyHistory: "Reply received",
   replyCheckedHistory: "Reply checked",
   replyDampStarted: (date) => "The tenant mentioned damp or mould, so the Awaab's Law clock started today. Investigate by " + date + " (10 working days).",
