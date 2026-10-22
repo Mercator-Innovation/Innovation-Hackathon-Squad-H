@@ -70,8 +70,25 @@
 
   function nav(current) {
     const link = (hash, label) => '<a href="' + hash + '"' + (current === hash ? ' aria-current="page"' : "") + ">" + label + "</a>";
-    return '<nav class="tenant-nav" aria-label="Pages">' + link("#report", T.navReport) + link("#check", T.navCheck) +
-      link("#help", T.navHelp) + "</nav>";
+    return '<div class="tenant-side">' +
+      '<nav class="tenant-nav" aria-label="Pages">' + link("#report", T.navReport) + link("#check", T.navCheck) +
+      link("#help", T.navHelp) + "</nav>" + contacts() + "</div>";
+  }
+
+  // "Need help?" under the side menu, on every view. Open on wide screens, where it stays in view;
+  // folded away on phones, so it doesn't push the form down.
+  function contacts() {
+    const open = window.matchMedia("(min-width: 1000px)").matches;
+    return '<aside class="help-contacts" aria-label="' + T.contactsHeading + '">' +
+      "<details" + (open ? " open" : "") + "><summary>" + T.contactsSummary + "</summary><ul>" +
+      T.contacts.map((c) => (
+        '<li class="' + (c.urgent ? "urgent" : "") + '">' +
+          (c.title ? '<span class="contact-title">' + c.title + "</span>" : "") +
+          (c.tel ? '<a href="tel:' + c.tel + '">' + c.call + "</a>" : '<span class="contact-call">' + c.text + "</span>") +
+          (c.hours ? '<span class="contact-hours">' + c.hours + "</span>" : "") +
+        "</li>"
+      )).join("") +
+      "</ul></details></aside>";
   }
 
   const radios = (name, options) => options.map((option) => (
