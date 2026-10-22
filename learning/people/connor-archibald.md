@@ -40,6 +40,7 @@ ai_use_week_after:
     - What officers do is saved only in that browser, so the shared screen and each laptop show different things.
     - The timescales are our reading of the guidance and law-firm summaries, not legal advice. Emergencies aren't covered.
     - Not yet tested with a screen reader.
+- 16:38 I tested the officer board with a screen reader, normally an accessibility specialist's job: it worked well. Long read-outs, but I think that's mainly because I don't use a screen reader every day, so I'm not used to it. (Before this, Claude had shortened each home's read-out from about 40 words to 8 to 20, and added "Back to the list of homes".)
 
 ## At 19:00
 - What I worked on: <answers>
