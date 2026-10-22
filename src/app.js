@@ -224,7 +224,10 @@
         if (level === "awaab") return awaabStatus(a.home.id).next.daysLeft - awaabStatus(b.home.id).next.daysLeft;
         const da = homeState(a.home.id).dismissed ? 1 : 0;
         const db = homeState(b.home.id).dismissed ? 1 : 0;
-        return da - db || levelOrder[a.level] - levelOrder[b.level] || b.score - a.score;
+        // New reports and replies waiting for a check come first, so they're seen straight away.
+        const ra = (homeState(a.home.id).replies || []).some((r) => !r.checked) ? 0 : 1;
+        const rb = (homeState(b.home.id).replies || []).some((r) => !r.checked) ? 0 : 1;
+        return da - db || ra - rb || levelOrder[a.level] - levelOrder[b.level] || b.score - a.score;
       });
 
     const counts = { high: 0, medium: 0, low: 0 };
@@ -248,9 +251,10 @@
       const s = homeState(a.home.id);
       const status = s.dismissed
         ? '<span class="badge status">' + C.dismissedLabel + "</span>"
-        : s.history.length ? '<span class="badge status">' + C.actionTakenLabel + "</span>" : "";
-      const replyBadge = (s.replies || []).some((r) => !r.checked)
-        ? '<span class="badge reply">' + C.replyToCheck + "</span>" : "";
+        : s.history.some((item) => item.type) ? '<span class="badge status">' + C.actionTakenLabel + "</span>" : "";
+      const unchecked = (s.replies || []).filter((r) => !r.checked);
+      const replyBadge = !unchecked.length ? "" : '<span class="badge reply">' +
+        (unchecked.some((r) => r.source === "tenant") ? C.tenantReportToCheck : C.replyToCheck) + "</span>";
       const clock = awaabStatus(a.home.id);
       const shortReasons = a.reasons.slice(0, 2).join("; ") + (a.reasons.length > 2 ? "; and more" : "");
       return '<li><button type="button" class="home-card level-' + a.level + (s.dismissed ? " is-dismissed" : "") +
@@ -313,8 +317,11 @@
       '<hr class="divider">' +
       "<h3>" + C.replyHeading + "</h3>" +
       replies.map((r, index) => (
-        '<div class="letter reply-received"><p><strong>' + C.replyReceived(formatDate(fromISO(r.date))) + "</strong></p>" +
+        '<div class="letter reply-received"><p><strong>' +
+          (r.source === "tenant" ? C.tenantReportReceived : C.replyReceived)(formatDate(fromISO(r.date))) + "</strong></p>" +
           "<ul>" + r.items.map((i) => "<li>" + C.letterItems[i] + "</li>").join("") + "</ul>" +
+          (r.note ? '<p class="tenant-note">' + C.tenantNoteLabel + "“" + escapeHtml(r.note) + "”</p>" : "") +
+          (r.contact ? '<p class="tenant-note">' + C.tenantContactLabel + escapeHtml(r.contact.toLowerCase()) + "</p>" : "") +
           (r.checked
             ? '<p class="success">' + C.replyChecked + "</p>"
             : '<p><button type="button" class="button secondary" data-reply="' + index + '">' + C.replyCheckButton + "</button></p>") +
@@ -590,6 +597,7 @@
 
   document.getElementById("service-name").textContent = C.serviceName;
   document.getElementById("banner").textContent = C.banner;
+  document.getElementById("tenant-link").textContent = C.tenantPageLink;
   document.getElementById("list-heading").textContent = C.listHeading;
   document.getElementById("list-intro").textContent = C.listIntro;
   document.getElementById("filter-level-label").textContent = C.filterLevel;
@@ -597,4 +605,13 @@
 
   renderList();
   renderDetail(false);
+
+  // A tenant's report from tenant.html, open in another tab, shows up here straight away.
+  window.addEventListener("storage", (event) => {
+    if (event.key !== STORAGE_KEY) return;
+    state = loadState();
+    reassess();
+    renderList();
+    renderDetail(false);
+  });
 })();
