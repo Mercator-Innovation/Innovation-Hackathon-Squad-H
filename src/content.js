@@ -190,6 +190,8 @@ window.CONTENT = {
     needsNoteLabel: "Anything else about the visit (optional)",
     needsNoteHint: "For example: which language, or the best door to use.",
 
+    moreSummary: "Tell us more (optional): who's at risk, a photo, when to visit",
+    moreHint: "This helps us come sooner, and be ready when we visit. You can skip it.",
     energyLegend: "Help with heating costs",
     energyCheck: "I'd like free help with my energy bills",
     energyHint: "Our energy advice team can visit to help with bills, tariffs and keeping warm for less.",

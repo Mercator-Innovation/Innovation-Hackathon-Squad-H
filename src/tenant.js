@@ -114,6 +114,17 @@
           '<p class="note" id="items-hint">' + T.itemsHint + "</p>" +
           '<p class="error" id="items-error" hidden></p>' + checks("item", items) +
         "</fieldset>" +
+        '<fieldset aria-describedby="energy-hint"><legend>' + T.energyLegend + "</legend>" +
+          '<p class="note" id="energy-hint">' + T.energyHint + "</p>" +
+          '<label class="check"><input type="checkbox" id="energy"><span>' + T.energyCheck + "</span></label>" +
+        "</fieldset>" +
+        '<fieldset id="contact" aria-describedby="contact-error"><legend>' + T.contactLegend + "</legend>" +
+          '<p class="error" id="contact-error" hidden></p>' + radios("contact", T.contactOptions) +
+        "</fieldset>" +
+        // The optional questions, tucked away so the form is short. The summary says what's inside.
+        '<details class="more" id="more">' +
+          "<summary>" + T.moreSummary + "</summary>" +
+          '<p class="note">' + T.moreHint + "</p>" +
         '<div class="field">' +
           '<label for="note">' + T.noteLabel + "</label>" +
           '<p class="note" id="note-hint">' + T.noteHint + "</p>" +
@@ -141,13 +152,7 @@
           '<p class="note" id="needs-note-hint">' + T.needsNoteHint + "</p>" +
           '<input type="text" id="needs-note" aria-describedby="needs-note-hint">' +
         "</div>" +
-        '<fieldset aria-describedby="energy-hint"><legend>' + T.energyLegend + "</legend>" +
-          '<p class="note" id="energy-hint">' + T.energyHint + "</p>" +
-          '<label class="check"><input type="checkbox" id="energy"><span>' + T.energyCheck + "</span></label>" +
-        "</fieldset>" +
-        '<fieldset id="contact" aria-describedby="contact-error"><legend>' + T.contactLegend + "</legend>" +
-          '<p class="error" id="contact-error" hidden></p>' + radios("contact", T.contactOptions) +
-        "</fieldset>" +
+        "</details>" +
         '<p class="note">' + T.emergency + "</p>" +
         '<button type="submit" class="button">' + T.sendButton + "</button>" +
       "</form>";
@@ -237,6 +242,10 @@
     check("items", problems.length || energy ? "" : T.itemsNeeded);
     check("risk", risks.length && !consent ? T.riskConsentNeeded : "");
     check("contact", contact ? "" : T.contactNeeded);
+    // If a problem is inside the optional questions, open them so the error can be seen.
+    if (errors.some((e) => document.getElementById("more").contains(document.getElementById(e.id)))) {
+      document.getElementById("more").open = true;
+    }
     if (errors.length) return showSummary(errors);
 
     // Save it as a reply the officer checks, like a questionnaire reply.
