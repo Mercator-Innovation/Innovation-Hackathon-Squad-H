@@ -245,6 +245,65 @@ th { background: var(--surface-warm); }
 .tests .checks li { border-radius: var(--radius-small); box-shadow: var(--shadow); }
 .result-summary { border-radius: var(--radius-small); }
 
+/* ---------- Wide screens: use the space, keep lines readable ---------- */
+/* Each page's content width. The header and page links line up with it. */
+:root { --page-max: 90rem; }
+body:has(.reminders) { --page-max: 80rem; }
+body:has(.tenant-page) { --page-max: 66rem; }
+body:has(.tests) { --page-max: 50rem; }
+
+.site-header, .page-nav {
+  padding-left: max(1.25rem, calc((100% - var(--page-max)) / 2 + 1.25rem));
+  padding-right: max(1.25rem, calc((100% - var(--page-max)) / 2 + 1.25rem));
+}
+
+/* The board: wider, with a slightly wider panel for the selected home. */
+.layout { max-width: var(--page-max); }
+@media (min-width: 900px) {
+  .layout { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+}
+
+/* Monthly reminders: the two short sections side by side, the rest full width. */
+.reminders { max-width: var(--page-max); }
+@media (min-width: 1000px) {
+  .reminders {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1.5rem;
+    align-items: start;
+  }
+  .reminders > :not(section),
+  .reminders > section:nth-of-type(n+3) { grid-column: 1 / -1; }
+  .reminders > section:nth-of-type(-n+2) { align-self: stretch; }
+}
+
+/* The tenant's page: on wide screens the page links become a menu down the left,
+   and the form sits beside it at a comfortable reading width. Reading order is unchanged. */
+@media (min-width: 1000px) {
+  .tenant-page {
+    max-width: var(--page-max);
+    display: grid;
+    grid-template-columns: 14rem minmax(0, 42rem);
+    column-gap: 3rem;
+    justify-content: center;
+    align-items: start;
+  }
+  .tenant-page > * { grid-column: 2; }
+  .tenant-page > .tenant-nav {
+    grid-column: 1;
+    grid-row: 1 / span 40;
+    position: sticky;
+    top: 1.5rem;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0.75rem;
+    background: var(--brand-tint);
+    border-radius: var(--radius);
+  }
+  .tenant-page > .tenant-nav a { padding: 0.55rem 0.9rem; }
+}
+
 /* ---------- Motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   .home-card, .button { transition: none; }
