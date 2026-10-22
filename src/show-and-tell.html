@@ -87,6 +87,16 @@
     .good { background: var(--blue-bg); border-left: 10px solid var(--blue); border-radius: 16px; padding: 1.25rem 1.5rem; }
     .quote { font-size: clamp(1.4rem, 3vw, 2.6rem); font-weight: 700; color: var(--green-dark); max-width: 30ch; }
 
+    .demo-buttons { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 1rem 0 1.5rem; }
+    .demo-button {
+      display: inline-block; font-weight: 800; font-size: clamp(1.2rem, 2.2vw, 2rem); text-decoration: none;
+      padding: 1rem 2rem; border-radius: 999px; background: var(--green); color: #fff; border: 3px solid var(--green);
+    }
+    .demo-button.secondary { background: #fff; color: var(--green); }
+    .demo-button:hover { background: var(--green-dark); color: #fff; }
+    .demo-button:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; box-shadow: 0 0 0 6px var(--text); }
+    .small { font-size: clamp(1rem, 1.6vw, 1.4rem); }
+
     /* Controls */
     .controls { position: fixed; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 2vw; background: rgba(250, 247, 242, 0.96); border-top: 1px solid #e6dfd3; }
     .controls button {
@@ -135,7 +145,18 @@
       </div>
     </section>
 
-    <section class="slide" aria-roledescription="slide" aria-label="3: What we built">
+    <section class="slide" aria-roledescription="slide" aria-label="3: Live demo">
+      <p class="kicker in">Live demo</p>
+      <h2 class="in">Let me show you</h2>
+      <p class="in lead">A tenant reports damp, and it lands on the officer's board with the legal clock already running.</p>
+      <div class="demo-buttons in">
+        <a class="demo-button" href="tenant.html" target="mb-tenant">1. Open the tenant page</a>
+        <a class="demo-button secondary" href="index.html" target="mb-board">2. Open the officer board</a>
+      </div>
+      <p class="in lead small">Use reference H-104. Then come back here and press → to carry on.</p>
+    </section>
+
+    <section class="slide" aria-roledescription="slide" aria-label="4: What we built">
       <p class="kicker in">What we built</p>
       <h2 class="in">One board for officers, one kind page for tenants</h2>
       <div class="two in">
@@ -160,7 +181,7 @@
       </div>
     </section>
 
-    <section class="slide" aria-roledescription="slide" aria-label="4: Built by two non-developers">
+    <section class="slide" aria-roledescription="slide" aria-label="5: Built by two non-developers">
       <p class="kicker in">Everyone builds</p>
       <h2 class="in">Built by two people who aren't developers</h2>
       <div class="stats in">
@@ -172,14 +193,14 @@
       <p class="in lead">A delivery manager built the tenant side. A QA engineer built a legal deadline engine.</p>
     </section>
 
-    <section class="slide" aria-roledescription="slide" aria-label="5: What didn't work">
+    <section class="slide" aria-roledescription="slide" aria-label="6: What didn't work">
       <p class="kicker in">What didn't work</p>
       <h2 class="in">It's a convincing demo, not a service</h2>
       <div class="warn in"><p>The tenant and officer sides only link up in the same browser. There's no real back end yet.</p></div>
       <p class="in lead">And Claude made mistakes too: a phone layout bug, a clash in the code, a miscounted test. Every one was caught by checking, never by trusting it.</p>
     </section>
 
-    <section class="slide" aria-roledescription="slide" aria-label="6: The surprise">
+    <section class="slide" aria-roledescription="slide" aria-label="7: The surprise">
       <p class="kicker in">The surprise</p>
       <h2 class="in">It pushed back like a careful colleague</h2>
       <ul class="in">
@@ -190,7 +211,7 @@
       </ul>
     </section>
 
-    <section class="slide title-slide" aria-roledescription="slide" aria-label="7: Next">
+    <section class="slide title-slide" aria-roledescription="slide" aria-label="8: Next">
       <p class="kicker in">What's next</p>
       <h2 class="in">Test it with real officers and tenants</h2>
       <p class="in">Real data with Cloch, sign-in and privacy for tenants, other languages and easy read.</p>
@@ -244,9 +265,9 @@
       document.getElementById("next").addEventListener("click", () => show(current + 1));
       document.getElementById("prev").addEventListener("click", () => show(current - 1));
       // Clicking anywhere on the slide moves on, like a clicker.
-      document.getElementById("deck").addEventListener("click", () => show(current + 1));
+      document.getElementById("deck").addEventListener("click", (e) => { if (!e.target.closest("a, button")) show(current + 1); });
       document.addEventListener("keydown", (e) => {
-        if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key) && e.target.tagName !== "BUTTON") { e.preventDefault(); show(current + 1); }
+        if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key) && !["BUTTON", "A"].includes(e.target.tagName)) { e.preventDefault(); show(current + 1); }
         if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); show(current - 1); }
         if (e.key === "Home") show(0);
         if (e.key === "End") show(slides.length - 1);
