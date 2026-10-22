@@ -3,7 +3,7 @@ window.CONTENT = {
   serviceName: "Healthier homes board",
   banner: "Prototype with made-up homes. Not a real service and no real tenants.",
   listHeading: "Homes to help first",
-  listIntro: "Homes with the most signs of risk come first. Each one says why. You make the final call.",
+  listIntro: "Homes most at risk come first. Each one says why. You decide what happens.",
   filterLevel: "Show",
   filterSearch: "Search by address or reference",
   levels: {
@@ -14,55 +14,55 @@ window.CONTENT = {
   },
   dismissedLabel: "Dismissed",
   actionTakenLabel: "Action booked",
-  emptyDetail: "Choose a home from the list to see why it was flagged and what you can do.",
+  emptyDetail: "Pick a home to see why it's on the list and what you can do.",
   noResults: "No homes match. Try a different search or filter.",
 
-  reasonsHeading: "Why this home was flagged",
+  reasonsHeading: "Why this home is on the list",
   noReasons: "No signs of risk right now.",
   aboutHeading: "About this home",
-  consentYes: "The tenant agreed that support notes can be used.",
-  consentNo: "The tenant hasn't agreed, so support notes aren't used.",
-  notesNotUsed: (n) => n + (n === 1 ? " support note isn't" : " support notes aren't") + " used, because the tenant hasn't agreed.",
+  consentYes: "The tenant said we can use their support notes.",
+  consentNo: "The tenant hasn't said yes, so we don't use their support notes.",
+  notesNotUsed: (n) => n + (n === 1 ? " support note" : " support notes") + " not used. The tenant hasn't said yes.",
 
-  actionHeading: "Choose what to do",
-  actionLegend: "Actions (choose one or more)",
+  actionHeading: "What to do",
+  actionLegend: "What will you do? Choose one or more.",
   urgencyLabel: "How urgent",
   urgencies: ["Today", "This week", "This month"],
-  confirmCheck: "I've checked the reasons and I'm making this decision.",
+  confirmCheck: "I've read the reasons. This is my decision.",
   confirmButton: "Book these actions",
   backToList: "Back to the list of homes",
-  confirmNeeded: "Tick the box to say you've checked the reasons.",
-  chooseAction: "Choose at least one action.",
+  confirmNeeded: "Tick the box to say you've read the reasons.",
+  chooseAction: "Choose at least one thing to do.",
 
   actions: {
-    energy: { label: "Book an energy advice visit", team: "Energy advice service" },
+    energy: { label: "Book a visit from energy advice", team: "Energy advice service" },
     damp: { label: "Book a damp and mould check", team: "Repairs team" },
-    wellbeing: { label: "Arrange a wellbeing call", team: "Community support team" },
-    letter: { label: "Send the tick-box questionnaire", team: "Housing officer" }
+    wellbeing: { label: "Ask community support to call", team: "Community support team" },
+    letter: { label: "Send the 'How is your home?' letter", team: "Housing officer" }
   },
-  awaabStarted: (date) => "Awaab's Law clock started. Investigate by " + date + " (10 working days).",
-  awaabAlreadyRunning: "The Awaab's Law clock is already running for this home.",
+  awaabStarted: (date) => "Awaab's Law clock started. Someone must look at the home by " + date + " (10 working days).",
+  awaabAlreadyRunning: "This home already has an Awaab's Law clock running.",
 
   // The Awaab's Law clock. Timescales from our research note (sketches/research-awaabs-law-and-cloch.md).
   awaab: {
     heading: "Awaab's Law clock",
-    intro: "The clock started when we became aware of possible damp or mould. These are the legal deadlines, in working days.",
+    intro: "The clock started when we first heard about possible damp or mould. These are the legal deadlines. They count working days only.",
     cardLabel: "Awaab's Law",
     steps: {
-      investigate: { label: "Investigate", rule: "within 10 working days of becoming aware" },
-      summary: { label: "Send the tenant a written summary", rule: "within 3 working days of the investigation" },
-      start: { label: "Start repairs", rule: "within 5 working days of the investigation, if there's substantial damp or mould" },
+      investigate: { label: "Investigate", rule: "within 10 working days of hearing about it" },
+      summary: { label: "Tell the tenant what we found, in writing", rule: "within 3 working days of investigating" },
+      start: { label: "Start repairs", rule: "within 5 working days of investigating, if there's substantial damp or mould" },
       finish: { label: "Finish repairs", rule: "within 20 working days of starting" }
     },
-    aware: (date) => "Became aware on " + date + ".",
+    aware: (date) => "We first heard on " + date + ".",
     done: (date) => "Done " + date,
     notNeeded: "Not needed: no substantial damp or mould found",
-    waiting: "Waits for the step before",
+    waiting: "Starts after the step before",
     dueBy: (date) => "Due by " + date,
     left: (n) => n === 0 ? "due today" : n + " working " + (n === 1 ? "day" : "days") + " left",
     late: (n) => n + " working " + (n === 1 ? "day" : "days") + " late",
     closed: "All steps done",
-    lateNote: "A deadline has been missed. Tell the tenant why and give a new date, and take steps to stop the damp or mould spreading. The tenant may be due compensation.",
+    lateNote: "A deadline has passed. Tell the tenant why, and give them a new date. Keep stopping the damp or mould from spreading. The tenant may be owed compensation.",
     markInvestigated: "Mark investigation done",
     substantialLegend: "Did the investigation find substantial damp or mould?",
     substantialYes: "Yes",
@@ -74,7 +74,7 @@ window.CONTENT = {
 
     // Recording a delay. Reasons and interim steps are the examples in the Scottish Government guidance.
     delayHeading: "Can't meet a deadline?",
-    delayIntro: "If something outside your control stops you, tell the tenant which deadline you can't meet, why, and a new date. Keep taking steps to stop the damp or mould spreading.",
+    delayIntro: "If something you can't control holds you up, tell the tenant: which deadline, why, and the new date. Keep stopping the damp or mould from spreading.",
     delayStepLabel: "Which deadline",
     delayReasonLabel: "Why",
     delayReasons: [
@@ -82,7 +82,7 @@ window.CONTENT = {
       "Illness or bereavement",
       "Contractor or supply problems",
       "No access to the home, despite reasonable attempts",
-      "Waiting for approval from another body"
+      "Waiting for another organisation to say yes"
     ],
     delayDateLabel: "New date",
     delayInterimLegend: "Steps you're taking in the meantime",
@@ -92,7 +92,7 @@ window.CONTENT = {
       "Temporary sealant on a leak",
       "Monitoring while we find out more"
     ],
-    delayToldCheck: "I've told the tenant which deadline we can't meet, why, and the new date, in a way that suits them.",
+    delayToldCheck: "I've told the tenant which deadline we'll miss, why, and the new date, in a way that works for them.",
     delayButton: "Record the delay",
     delayDateNeeded: "Choose a new date after the current deadline.",
     delayInterimNeeded: "Choose at least one step you're taking in the meantime.",
@@ -106,21 +106,21 @@ window.CONTENT = {
 
   letterPreviewSummary: "See the questionnaire the tenant gets",
   letterTitle: "How is your home?",
-  letterIntro: "We want to make sure your home is warm, dry and healthy. Tick anything that's true for you and send it back. There's no wrong answer, and you won't be blamed.",
+  letterIntro: "We want your home to be warm, dry and healthy. Tick anything that's true and send this back. There are no wrong answers. You won't be blamed.",
   letterItems: [
-    "There's damp or mould somewhere in my home",
+    "There's damp or mould in my home",
     "My home is hard to keep warm",
     "I can't always afford to heat my home",
-    "Windows run with water in the morning",
+    "My windows are wet in the morning",
     "Something needs fixing",
     "I'd like someone to call me"
   ],
-  letterEnd: "Send it back in the free envelope, or tell us by phone or text.",
+  letterEnd: "Post it back in the free envelope. Or tell us by phone or text.",
   // How much each ticked answer adds to the home's risk, in the same order as letterItems.
   letterPoints: [2, 2, 2, 1, 1, 1],
 
   replyHeading: "The tenant's reply",
-  replyIntro: "Record what the tenant ticked, whether it came by post, phone or text.",
+  replyIntro: "Record what the tenant ticked. It might come by post, phone or text.",
   replyLegend: "What the tenant ticked",
   replyButton: "Record reply",
   replyNeeded: "Tick at least one answer.",
@@ -225,11 +225,11 @@ window.CONTENT = {
   reportEnergy: "Asked for help with energy bills",
 
   dismissHeading: "Not needed?",
-  dismissLabel: "Why you're dismissing this flag",
-  dismissHint: "For example: already in touch, or the tenant has moved.",
-  dismissButton: "Dismiss flag",
-  dismissNeeded: "Say why you're dismissing it.",
-  dismissed: (reason) => "Flag dismissed: " + reason,
+  dismissLabel: "Why isn't this needed?",
+  dismissHint: "For example: we're already in touch, or the tenant has moved.",
+  dismissButton: "Dismiss this home",
+  dismissNeeded: "Say why it isn't needed.",
+  dismissed: (reason) => "Dismissed: " + reason,
   undoDismiss: "Undo dismiss",
 
   historyHeading: "What's been done",
@@ -241,14 +241,14 @@ window.CONTENT = {
     oldHome: (y) => "Built in " + y,
     condensation: (n) => n + " condensation or mould " + (n === 1 ? "job" : "jobs") + " in the last year",
     leak: (n) => n + " leak " + (n === 1 ? "job" : "jobs") + " in the last year",
-    arrears: (w) => "Rent arrears of " + w + " weeks",
+    arrears: (w) => "Rent arrears: " + w + " weeks",
     fuel: (n) => "Asked for fuel vouchers " + n + (n === 1 ? " time" : " times"),
     gasNoAccess: "No access at the last gas safety check",
     quiet: (m) => "No contact for " + m + " months",
-    supportNote: (note) => "Support note (shared with consent): " + note,
+    supportNote: (note) => "Support note (tenant said yes): " + note,
     reply: (item) => "Tenant said: " + item,
     atRisk: (who) => "At risk at home (shared with consent): " + who,
-    olderPlus: "Tenant aged 75 or over, as well as other signs",
-    olderCheckIn: "Tenant aged 75 or over: regular check-in due"
+    olderPlus: "Tenant is 75 or over, and there are other signs",
+    olderCheckIn: "Tenant is 75 or over: time for a regular check-in"
   }
 };
