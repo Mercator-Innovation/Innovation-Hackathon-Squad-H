@@ -70,6 +70,36 @@ window.CONTENT = {
     markSummary: "Mark summary sent",
     markStarted: "Mark repairs started",
     markFinished: "Mark repairs finished",
+
+    // Recording a delay. Reasons and interim steps are the examples in the Scottish Government guidance.
+    delayHeading: "Can't meet a deadline?",
+    delayIntro: "If something outside your control stops you, tell the tenant which deadline you can't meet, why, and a new date. Keep taking steps to stop the damp or mould spreading.",
+    delayStepLabel: "Which deadline",
+    delayReasonLabel: "Why",
+    delayReasons: [
+      "Severe weather or travel problems",
+      "Illness or bereavement",
+      "Contractor or supply problems",
+      "No access to the home, despite reasonable attempts",
+      "Waiting for approval from another body"
+    ],
+    delayDateLabel: "New date",
+    delayInterimLegend: "Steps you're taking in the meantime",
+    delayInterim: [
+      "Temporary mould removal",
+      "Temporary extractor fan",
+      "Temporary sealant on a leak",
+      "Monitoring while we find out more"
+    ],
+    delayToldCheck: "I've told the tenant which deadline we can't meet, why, and the new date, in a way that suits them.",
+    delayButton: "Record the delay",
+    delayDateNeeded: "Choose a new date after the current deadline.",
+    delayInterimNeeded: "Choose at least one step you're taking in the meantime.",
+    delayToldNeeded: "Tick the box to say you've told the tenant.",
+    delayed: (date, reason) => "Delayed to " + date + ": " + reason,
+    delayInterimShown: (steps) => "In the meantime: " + steps.join(", ").toLowerCase(),
+    delayRecorded: (step) => step + ": delay recorded",
+    delayedTag: "new date",
     summaryCount: (running, late) => running + " Awaab's Law " + (running === 1 ? "clock" : "clocks") + " running, " + late + " late."
   },
 
