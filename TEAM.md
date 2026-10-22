@@ -32,11 +32,11 @@ The **squad lead** runs the squad's setup before the day: agreeing the two roles
 
 <!-- At the look together, the squad uses the prototype as the person it's helping. The product owner's session writes one short line for each, then what the squad will do next, and shares it. -->
 
-**What's working:** _(at 17:15)_
-**What's confusing:** _(at 17:15)_
-**What's missing:** _(at 17:15)_
-**What we'll do next:** _(the product owner's call)_
-**Presenting at show and tell:** _(chosen at 17:15)_
+**What's working:** Each home says clearly why it's flagged; the Awaab's Law clock; the kind, no-blame tenant form that lands on the board straight away; the manager view and the map.
+**What's confusing:** The tenant and officer pages only link up in the same browser on one computer.
+**What's missing:** Real data, and checking our assumptions with Cloch; sign-in and privacy for tenants; testing with real tenants and officers; other languages and an easy-read version.
+**What we'll do next:** Keep building until 18:30, then show and tell.
+**Presenting at show and tell:** Connor Archibald
 
 ## Links
 
