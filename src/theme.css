@@ -1,0 +1,252 @@
+/* The look and feel: warm and friendly. Loads after styles.css on every page.
+   Change the colours, corners and type here. Every text colour meets at least 4.5:1 contrast
+   on its background; borders on form fields meet at least 3:1. Remove this file's <link> to undo. */
+:root {
+  --font: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  --text: #1f2a24;
+  --text-muted: #4b5850;
+  --background: #faf7f2;
+  --surface: #ffffff;
+  --surface-warm: #fdfbf7;
+  --border: #e6dfd3;
+  --control-border: #6b766f;
+  --brand: #1f4d3a;
+  --brand-dark: #163a2b;
+  --brand-tint: #eaf3ee;
+  --brand-text: #ffffff;
+  --accent: #e9b949;
+  --focus: #ffbf47;
+  --high: #a4161a;
+  --high-bg: #fdecea;
+  --medium: #8a4b00;
+  --medium-bg: #fff1d6;
+  --low: #1d4f91;
+  --low-bg: #e8f0fb;
+  --none: #4b5850;
+  --none-bg: #f0ede7;
+  --good: #1e6b33;
+  --good-bg: #e6f4ea;
+  --radius: 16px;
+  --radius-small: 10px;
+  --shadow: 0 1px 2px rgba(70, 50, 20, 0.06), 0 4px 14px rgba(70, 50, 20, 0.07);
+  --shadow-raised: 0 2px 4px rgba(70, 50, 20, 0.08), 0 10px 24px rgba(70, 50, 20, 0.1);
+}
+
+/* ---------- Type ---------- */
+body { font-size: 1.125rem; line-height: 1.6; }
+h1 { font-size: 2rem; letter-spacing: -0.01em; color: var(--brand-dark); }
+h2 { font-size: 1.4rem; color: var(--brand-dark); }
+h3 { font-size: 1.15rem; }
+a { color: var(--brand); text-underline-offset: 0.15em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 3px; }
+.intro { font-size: 1.15rem; }
+
+/* ---------- Header and page links ---------- */
+.site-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 5px solid var(--accent);
+}
+.service-name {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.3rem;
+  letter-spacing: 0.01em;
+}
+/* A small house, drawn in CSS, so it's decoration only. */
+.service-name::before {
+  content: "";
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  background: var(--accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3 2 11.5h3V21h5.5v-6h3v6H19v-9.5h3z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3 2 11.5h3V21h5.5v-6h3v6H19v-9.5h3z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.banner { opacity: 0.95; }
+.header-link a { color: var(--brand-text); font-weight: 600; }
+
+.page-nav {
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  background: var(--surface-warm);
+  border-bottom: 1px solid var(--border);
+}
+.page-nav a {
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--brand);
+}
+.page-nav a:hover { background: var(--brand-tint); }
+.page-nav a[aria-current="page"] {
+  background: var(--brand);
+  color: var(--brand-text);
+  border-bottom: 0;
+}
+
+/* ---------- Layout ---------- */
+.layout { gap: 1.5rem; padding: 1.5rem 1.25rem; }
+@media (min-width: 900px) {
+  .detail-panel { top: 1.25rem; max-height: calc(100vh - 2.5rem); }
+}
+
+/* ---------- Form fields ---------- */
+select, input[type="search"], input[type="text"], input[type="date"], textarea {
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--control-border);
+  border-radius: var(--radius-small);
+  background: var(--surface);
+}
+select:hover, input[type="search"]:hover, input[type="text"]:hover, input[type="date"]:hover, textarea:hover {
+  border-color: var(--brand);
+}
+input[type="checkbox"], input[type="radio"] { accent-color: var(--brand); }
+.radio input, .check input { width: 1.4rem; height: 1.4rem; }
+.radio, .check { padding: 0.15rem 0; }
+label, legend { color: var(--text); }
+
+/* ---------- The list of homes ---------- */
+.summary {
+  background: var(--surface);
+  border-radius: var(--radius-small);
+  padding: 0.5rem 0.85rem;
+  box-shadow: var(--shadow);
+}
+.home-list { gap: 0.75rem; }
+.home-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1rem 1rem 1.4rem;
+  box-shadow: var(--shadow), inset 6px 0 0 var(--none);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+/* The coloured stripe is a backup: every card also says its risk in words. */
+.home-card.level-high { box-shadow: var(--shadow), inset 6px 0 0 var(--high); }
+.home-card.level-medium { box-shadow: var(--shadow), inset 6px 0 0 var(--medium); }
+.home-card.level-low { box-shadow: var(--shadow), inset 6px 0 0 var(--low); }
+.home-card:hover { border-color: var(--border); transform: translateY(-1px); }
+.home-card.level-high:hover { box-shadow: var(--shadow-raised), inset 6px 0 0 var(--high); }
+.home-card.level-medium:hover { box-shadow: var(--shadow-raised), inset 6px 0 0 var(--medium); }
+.home-card.level-low:hover { box-shadow: var(--shadow-raised), inset 6px 0 0 var(--low); }
+.home-card.level-none:hover { box-shadow: var(--shadow-raised), inset 6px 0 0 var(--none); }
+.home-card[aria-current="true"] { outline: 3px solid var(--brand); outline-offset: 2px; }
+/* Focus: yellow ring with a dark halo, so it stands out on white and cream (the card shadows
+   would otherwise hide the halo from styles.css). */
+.home-card:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.home-card.level-high:focus-visible { box-shadow: 0 0 0 7px var(--text), inset 6px 0 0 var(--high); }
+.home-card.level-medium:focus-visible { box-shadow: 0 0 0 7px var(--text), inset 6px 0 0 var(--medium); }
+.home-card.level-low:focus-visible { box-shadow: 0 0 0 7px var(--text), inset 6px 0 0 var(--low); }
+.home-card.level-none:focus-visible { box-shadow: 0 0 0 7px var(--text), inset 6px 0 0 var(--none); }
+.home-card.is-dismissed { opacity: 0.85; border-style: dashed; }
+.card-address { font-size: 1.1rem; color: var(--brand-dark); }
+.card-clock { margin-top: 0.5rem; }
+.card-reasons { display: block; margin-top: 0.5rem; }
+
+/* ---------- Badges ---------- */
+.badge {
+  font-size: 0.875rem;
+  padding: 0.2rem 0.7rem;
+  letter-spacing: 0.01em;
+}
+.badge.awaab { background: var(--brand-tint); border-radius: var(--radius-small); }
+
+/* ---------- Panels ---------- */
+.detail-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+.detail-panel h2 { font-size: 1.6rem; }
+.back-link { font-size: 1rem; }
+.divider { border-top-color: var(--border); margin: 1.5rem 0; }
+.facts { gap: 0.35rem 1.25rem; }
+
+.clock {
+  border: 2px solid var(--brand);
+  border-radius: var(--radius);
+  background: linear-gradient(var(--brand-tint), var(--surface) 4rem);
+  padding: 1rem 1.25rem;
+}
+.clock-steps li { margin-bottom: 0.75rem; }
+
+/* ---------- Buttons ---------- */
+.button {
+  border-radius: 999px;
+  padding: 0.7rem 1.5rem;
+  box-shadow: 0 2px 0 var(--brand-dark);
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+.button:hover { background: var(--brand-dark); border-color: var(--brand-dark); }
+.button:active { transform: translateY(1px); box-shadow: none; }
+.button.secondary { box-shadow: none; }
+.button:focus-visible, .button.secondary:focus-visible { box-shadow: 0 0 0 5px var(--text); }
+.button.secondary:hover { background: var(--brand-tint); color: var(--brand-dark); }
+
+/* ---------- Messages ---------- */
+.success, .warning {
+  border-radius: var(--radius-small);
+  border-left-width: 6px;
+  padding: 0.75rem 1rem;
+}
+.error-summary { border-radius: var(--radius-small); }
+
+/* ---------- Letters, emails and details ---------- */
+summary { padding: 0.25rem 0; }
+.letter {
+  background: var(--surface-warm);
+  border: 2px dashed var(--control-border);
+  border-radius: var(--radius-small);
+  padding: 1rem 1.25rem;
+}
+.email { border-radius: var(--radius); box-shadow: var(--shadow); }
+.email-button { border-radius: 999px; padding: 0.6rem 1.3rem; }
+
+/* ---------- Monthly reminders ---------- */
+.reminders { padding: 1.5rem 1.25rem; }
+.reminders section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow);
+}
+.next-send {
+  display: inline-block;
+  background: var(--brand-tint);
+  color: var(--brand-dark);
+  border-radius: var(--radius-small);
+  padding: 0.5rem 0.9rem;
+}
+.table-wrap { border: 1px solid var(--border); border-radius: var(--radius-small); }
+th { background: var(--surface-warm); }
+
+/* ---------- The tenant's page ---------- */
+.tenant-page { padding: 1.5rem 1.25rem; }
+@media (min-width: 700px) {
+  .tenant-page {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 2rem 2.25rem;
+  }
+}
+.conditional { border-left-color: var(--accent); border-left-width: 5px; }
+.check.consent { background: var(--brand-tint); border-radius: var(--radius-small); padding: 0.75rem; }
+.tenant-nav a { text-decoration: none; padding: 0.35rem 0.9rem; border-radius: 999px; }
+.tenant-nav a:hover { background: var(--brand-tint); }
+.tenant-nav a[aria-current="page"] { background: var(--brand); color: var(--brand-text); border-bottom: 0; }
+
+/* ---------- The test page ---------- */
+.tests .checks li { border-radius: var(--radius-small); box-shadow: var(--shadow); }
+.result-summary { border-radius: var(--radius-small); }
+
+/* ---------- Motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .home-card, .button { transition: none; }
+  .home-card:hover, .button:active { transform: none; }
+}
