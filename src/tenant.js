@@ -233,7 +233,7 @@
     const check = (id, message, target) => { showError(id, message); if (message) errors.push({ id: target || id, message }); };
     check("who", who ? "" : T.whoNeeded);
     check("other", other && (!relation || !knows) ? T.otherNeeded : "", "relation");
-    check("ref", !refText.trim() ? T.refNeeded : !home ? (other ? T.refNotFoundOther : T.refNotFound) : "");
+    check("ref", !refText.trim() ? (other ? T.refNeededOther : T.refNeeded) : !home ? (other ? T.refNotFoundOther : T.refNotFound) : "");
     check("items", problems.length || energy ? "" : T.itemsNeeded);
     check("risk", risks.length && !consent ? T.riskConsentNeeded : "");
     check("contact", contact ? "" : T.contactNeeded);
