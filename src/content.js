@@ -10,8 +10,10 @@ window.CONTENT = {
     high: { label: "High", hint: "act this week", icon: "▲" },
     medium: { label: "Medium", hint: "act this month", icon: "●" },
     low: { label: "Low", hint: "keep an eye on", icon: "▽" },
-    none: { label: "No signs", hint: "nothing to do now", icon: "–" }
+    none: { label: "No signs", hint: "nothing to do now", icon: "–" },
+    check: { label: "New report", hint: "check today", icon: "◆" }
   },
+  checkLevelNote: "Check the report below. Once you have, the board works out this home's risk again.",
   dismissedLabel: "Dismissed",
   actionTakenLabel: "Action booked",
   emptyDetail: "Pick a home to see why it's on the list and what you can do.",
@@ -164,6 +166,7 @@ window.CONTENT = {
     refHint: "It's on your rent letter. For example, H-101.",
     refHintOther: "Their reference, like H-101, or their full address, like 14 Thistle Walk.",
     refNeeded: "Enter your tenancy reference, like H-101.",
+    refNeededOther: "Enter their tenancy reference or address, like H-101 or 14 Thistle Walk.",
     refNotFound: "We can't find that. Check the reference on the rent letter. It looks like H-101.",
     refNotFoundOther: "We can't find that. Try their reference, like H-101, or their full address, like 2/1, 14 Thistle Walk.",
 

@@ -199,6 +199,13 @@
       "</div>";
   }
 
+  // A new report or reply waiting for a check shows as "New report: check today" rather than
+  // a low risk level, so a real damp report never looks like it can wait. High stays high.
+  function shownLevel(a) {
+    const waiting = (homeState(a.home.id).replies || []).some((r) => !r.checked);
+    return waiting && a.level !== "high" ? "check" : a.level;
+  }
+
   // What's waiting for a check: a report from the tenant, from someone else, or a letter reply.
   function reportLabel(unchecked) {
     const online = unchecked.filter((r) => r.source === "tenant");
@@ -285,22 +292,23 @@
       const replyBadge = !unchecked.length ? "" : '<span class="badge reply">' +
         reportLabel(unchecked) + "</span>";
       const clock = awaabStatus(a.home.id);
+      const lv = shownLevel(a);
       const shortReasons = a.reasons.slice(0, 2).join("; ") + (a.reasons.length > 2 ? "; and more" : "");
       // Screen readers and voice control get a short name: the address first (as seen on the card),
       // then the risk, any deadline and status. The reasons are read in the home's details instead.
       const spoken = [
         a.home.address,
-        C.levels[a.level].label + ": " + C.levels[a.level].hint,
+        C.levels[lv].label + ": " + C.levels[lv].hint,
         clock ? awaabText(clock) : "",
         s.dismissed ? C.dismissedLabel : s.history.some((item) => item.type) ? C.actionTakenLabel : "",
         unchecked.length ? reportLabel(unchecked) : ""
       ].filter(Boolean).join(". ");
-      return '<li><button type="button" class="home-card level-' + a.level + (s.dismissed ? " is-dismissed" : "") +
+      return '<li><button type="button" class="home-card level-' + lv + (s.dismissed ? " is-dismissed" : "") +
         '" data-id="' + a.home.id + '" aria-label="' + escapeHtml(spoken) + '"' +
         (a.home.id === selectedId ? ' aria-current="true"' : "") + ">" +
         '<span class="card-top"><span class="card-address">' + a.home.address + "</span>" +
         '<span class="card-ref">' + a.home.id + ", " + a.home.area + "</span></span>" +
-        "<span>" + badge(a.level) + status + replyBadge + "</span>" +
+        "<span>" + badge(lv) + status + replyBadge + "</span>" +
         (clock ? '<span class="card-clock">' + awaabBadge(clock) + "</span>" : "") +
         '<span class="card-reasons">' + (shortReasons || C.noReasons) + "</span>" +
         "</button></li>";
@@ -405,7 +413,8 @@
     detailEl.innerHTML =
       '<h2 id="detail-heading" tabindex="-1">' + h.address + "</h2>" +
       '<p><a href="#home-list" class="back-link" id="back-to-list">' + C.backToList + "</a></p>" +
-      "<p>" + badge(a.level) + "</p>" +
+      "<p>" + badge(shownLevel(a)) + "</p>" +
+      (shownLevel(a) === "check" ? '<p class="note">' + C.checkLevelNote + "</p>" : "") +
       (s.awaab ? renderAwaab(s.awaab) : "") +
 
       "<h3>" + C.reasonsHeading + "</h3>" + reasons +

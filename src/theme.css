@@ -130,6 +130,11 @@ label, legend { color: var(--text); }
 .home-card.level-medium:hover { box-shadow: var(--shadow-raised), inset 6px 0 0 var(--medium); }
 .home-card.level-low:hover { box-shadow: var(--shadow-raised), inset 6px 0 0 var(--low); }
 .home-card.level-none:hover { box-shadow: var(--shadow-raised), inset 6px 0 0 var(--none); }
+/* A new report waiting for a check: amber, with "New report: check today" in words. */
+.badge.level-check { color: var(--medium); background: var(--medium-bg); }
+.home-card.level-check { box-shadow: var(--shadow), inset 6px 0 0 var(--medium); }
+.home-card.level-check:hover { box-shadow: var(--shadow-raised), inset 6px 0 0 var(--medium); }
+.home-card.level-check:focus-visible { box-shadow: 0 0 0 7px var(--text), inset 6px 0 0 var(--medium); }
 .home-card[aria-current="true"] { outline: 3px solid var(--brand); outline-offset: 2px; }
 /* Focus: yellow ring with a dark halo, so it stands out on white and cream (the card shadows
    would otherwise hide the halo from styles.css). */
