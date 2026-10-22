@@ -348,6 +348,60 @@ th { background: var(--surface-warm); }
   .manager .table-wrap { overflow: visible; }
 }
 
+/* ---------- Map ---------- */
+/* Same width and edges as the other officer pages, so nothing jumps when switching tabs. */
+.map-page { max-width: var(--page-max); margin: 0 auto; padding: 1.5rem 1.25rem; }
+.map-page > p { max-width: 70ch; }
+.map-wrap { border-radius: var(--radius); box-shadow: var(--shadow); padding: 1rem; }
+/* Big enough that labels are readable and markers easy to hit, without being taller than the screen. */
+.map-svg { max-width: 1000px; margin: 0 auto; }
+.map-street-name { font-size: 15px; font-weight: 600; fill: #3d4a42; }
+.map-num { font-size: 13px; fill: #3d4a42; }
+/* The illustrated map: land, river, parks, roads and houses. Labels keep at least 4.5:1 contrast. */
+.map-land { fill: #f3f0e6; }
+.map-water { fill: #c9e1ea; stroke: #9fc4d2; stroke-width: 2; }
+.map-water-name { font: italic 600 14px var(--font); fill: #2f5f72; }
+.map-park { fill: #dbead2; stroke: #c3dbb6; stroke-width: 2; }
+.map-tree { fill: #a9cf99; stroke: #8fbd7d; stroke-width: 1.5; }
+.map-park-name { font: italic 600 13px var(--font); fill: #355e2c; }
+.map-road-edge { stroke: #cfc6b4; stroke-width: 14; stroke-linecap: round; fill: none; }
+.map-road { stroke: #ffffff; stroke-width: 10; stroke-linecap: round; fill: none; }
+.map-road-edge.main { stroke: #d8b56a; stroke-width: 16; }
+.map-road.main { stroke: #f7e2a8; stroke-width: 11; }
+.map-main-road-name { font: 600 12px var(--font); fill: #6b4f12; letter-spacing: 0.04em; }
+.map-block { fill: #e2dacb; stroke: #cdc3b1; stroke-width: 1; }
+.map-area-name { font: 700 13px var(--font); fill: #4b5850; text-transform: uppercase; letter-spacing: 0.16em; }
+.map-compass circle { fill: #ffffff; stroke: #cfc6b4; stroke-width: 2; }
+.map-compass path { fill: var(--brand); }
+.map-compass text { font: 700 12px var(--font); fill: var(--brand-dark); }
+.map-made-up { font: italic 12px var(--font); fill: #5b6660; }
+/* A soft outline in the land colour keeps labels readable where they cross a road or a house. */
+.map-area-name, .map-street-name, .map-num, .map-main-road-name, .map-park-name {
+  paint-order: stroke;
+  stroke: #f3f0e6;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.map-park-name { stroke: #dbead2; }
+/* An invisible ring around each marker makes it easier to click or tap. */
+.map-svg a .mk { stroke: transparent; stroke-width: 14px; }
+.map-svg a:focus-visible .mk { stroke: var(--text); stroke-width: 4; }
+/* Phones: the map keeps a usable size and you swipe across it; the list below is the easy way in. */
+@media (max-width: 700px) {
+  .map-page { padding-left: 1rem; padding-right: 1rem; }
+  .map-wrap { overflow-x: auto; padding: 0.5rem; }
+  .map-wrap::before {
+    content: "Swipe sideways to see the whole map";
+    position: sticky;
+    left: 0;
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+  }
+  .map-svg { min-width: 760px; }
+}
+
 /* ---------- The tenant's page ---------- */
 .tenant-page { padding: 1.5rem 1.25rem; }
 @media (min-width: 700px) {
