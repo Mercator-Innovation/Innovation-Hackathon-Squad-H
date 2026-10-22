@@ -44,6 +44,17 @@ a { color: var(--brand); text-underline-offset: 0.15em; text-decoration-thicknes
 a:hover { text-decoration-thickness: 3px; }
 .intro { font-size: 1.15rem; }
 
+/* Readable line length on big screens: about 70 characters at most. */
+.intro, .reminders > p, .reminders section > p, .tests > p { max-width: 70ch; }
+
+/* Links that stand on their own (like "Back to the board" and the error summary's links)
+   get a taller tap area: at least 24 pixels, so they're easy to hit on a phone. */
+main p > a:only-child, .error-summary a, .back-link {
+  display: inline-block;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+}
+
 /* ---------- Header and page links ---------- */
 .site-header {
   padding: 1rem 1.25rem;
