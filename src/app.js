@@ -199,6 +199,13 @@
       "</div>";
   }
 
+  // What's waiting for a check: a report from the tenant, from someone else, or a letter reply.
+  function reportLabel(unchecked) {
+    const online = unchecked.filter((r) => r.source === "tenant");
+    if (!online.length) return C.replyToCheck;
+    return online.some((r) => !r.reporter) ? C.tenantReportToCheck : C.otherReportToCheck;
+  }
+
   function badge(level) {
     const l = C.levels[level];
     return '<span class="badge level-' + level + '"><span aria-hidden="true">' + l.icon + "</span> " +
@@ -241,10 +248,15 @@
         if (level === "awaab") return awaabStatus(a.home.id).next.daysLeft - awaabStatus(b.home.id).next.daysLeft;
         const da = homeState(a.home.id).dismissed ? 1 : 0;
         const db = homeState(b.home.id).dismissed ? 1 : 0;
-        // New reports and replies waiting for a check come first, so they're seen straight away.
+        // Missed legal deadlines come first, most overdue at the top: the law says act now.
+        const la = awaabStatus(a.home.id);
+        const lb = awaabStatus(b.home.id);
+        const lateA = la && la.late ? la.next.daysLeft : 1;
+        const lateB = lb && lb.late ? lb.next.daysLeft : 1;
+        // Then new reports and replies waiting for a check, so they're seen straight away.
         const ra = (homeState(a.home.id).replies || []).some((r) => !r.checked) ? 0 : 1;
         const rb = (homeState(b.home.id).replies || []).some((r) => !r.checked) ? 0 : 1;
-        return da - db || ra - rb || levelOrder[a.level] - levelOrder[b.level] || b.score - a.score;
+        return da - db || lateA - lateB || ra - rb || levelOrder[a.level] - levelOrder[b.level] || b.score - a.score;
       });
 
     const counts = { high: 0, medium: 0, low: 0 };
@@ -271,7 +283,7 @@
         : s.history.some((item) => item.type) ? '<span class="badge status">' + C.actionTakenLabel + "</span>" : "";
       const unchecked = (s.replies || []).filter((r) => !r.checked);
       const replyBadge = !unchecked.length ? "" : '<span class="badge reply">' +
-        (unchecked.some((r) => r.source === "tenant") ? C.tenantReportToCheck : C.replyToCheck) + "</span>";
+        reportLabel(unchecked) + "</span>";
       const clock = awaabStatus(a.home.id);
       const shortReasons = a.reasons.slice(0, 2).join("; ") + (a.reasons.length > 2 ? "; and more" : "");
       // Screen readers and voice control get a short name: the address first (as seen on the card),
@@ -281,7 +293,7 @@
         C.levels[a.level].label + ": " + C.levels[a.level].hint,
         clock ? awaabText(clock) : "",
         s.dismissed ? C.dismissedLabel : s.history.some((item) => item.type) ? C.actionTakenLabel : "",
-        unchecked.length ? (unchecked.some((r) => r.source === "tenant") ? C.tenantReportToCheck : C.replyToCheck) : ""
+        unchecked.length ? reportLabel(unchecked) : ""
       ].filter(Boolean).join(". ");
       return '<li><button type="button" class="home-card level-' + a.level + (s.dismissed ? " is-dismissed" : "") +
         '" data-id="' + a.home.id + '" aria-label="' + escapeHtml(spoken) + '"' +

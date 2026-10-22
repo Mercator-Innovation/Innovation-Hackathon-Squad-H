@@ -131,6 +131,7 @@ window.CONTENT = {
   tenantReportReceived: (date) => "Reported online, " + date,
   tenantHistoryOther: "Someone else reported this online",
   tenantReportToCheck: "New report from tenant",
+  otherReportToCheck: "New report from someone else",
   tenantHistory: "The tenant reported this online",
   tenantNoteLabel: "In their words: ",
   tenantContactLabel: "Get in touch by: ",
