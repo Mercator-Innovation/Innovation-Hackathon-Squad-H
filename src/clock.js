@@ -77,8 +77,32 @@
     return steps;
   }
 
+  // The step to undo if one was marked done by mistake: the most recent, and if two were done
+  // on the same day, the later one in the legal order. Null if nothing is done yet.
+  const ORDER = ["investigate", "summary", "start", "finish"];
+  const FIELD = { investigate: "investigated", summary: "summarySent", start: "repairsStarted", finish: "repairsFinished" };
+  function lastDoneStep(c) {
+    const done = ORDER.filter((key) => c[FIELD[key]]);
+    if (!done.length) return null;
+    return done.sort((a, b) => c[FIELD[b]].localeCompare(c[FIELD[a]]) || ORDER.indexOf(b) - ORDER.indexOf(a))[0];
+  }
+
+  // A copy of the case with that step undone. Undoing the investigation also forgets what it found.
+  function undoStep(c, key) {
+    const copy = Object.assign({}, c, { [FIELD[key]]: null });
+    if (key === "investigate") copy.substantial = null;
+    return copy;
+  }
+
+  // Compensation a social landlord's tenant may claim for a missed deadline: £15, then £3 for
+  // each further working day, up to £100 a repair. From law-firm summaries: an estimate, not legal advice.
+  function compensationEstimate(workingDaysLate) {
+    if (workingDaysLate <= 0) return 0;
+    return Math.min(100, 15 + 3 * (workingDaysLate - 1));
+  }
+
   window.Clock = {
     isWorkingDay, addWorkingDays, startOfToday, toISO, fromISO,
-    workingDaysFromToday, newCase, awaabSteps
+    workingDaysFromToday, newCase, awaabSteps, lastDoneStep, undoStep, compensationEstimate
   };
 })();
