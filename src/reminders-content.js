@@ -1,7 +1,7 @@
 // The words on the monthly reminders page, and in the email and letter tenants get.
 window.REMINDERS_CONTENT = {
   heading: "Monthly check-in reminders",
-  intro: "Every month or so, we remind tenants to tell us about damp, mould, cold or repairs. Tenants who never get in touch are the ones we most need to hear from.",
+  intro: "Every month or two, we remind tenants to tell us about damp, mould, cold or repairs. The tenants who never get in touch are the ones we most need to hear from.",
   prototypeNote: "This is a prototype: nothing is really sent.",
 
   settingsHeading: "How often",
@@ -27,17 +27,17 @@ window.REMINDERS_CONTENT = {
   emailSubject: "How is your home this month?",
   emailBody: [
     "Hello,",
-    "Once a month we check in to make sure your home is warm, dry and healthy.",
-    "Have you noticed damp, mould, cold, or anything that needs fixing? Please tell us. It only takes a minute, and you won't be blamed.",
-    "You can also phone us, or reply to this email."
+    "Every month we check your home is warm, dry and healthy.",
+    "Have you seen damp, mould or cold? Does anything need fixing? Please tell us. It takes a minute. You won't be blamed.",
+    "You can also phone us or reply to this email."
   ],
   emailLink: "Tell us how your home is",
-  emailStop: "Don't want these reminders? Reply STOP and we'll stop sending them.",
+  emailStop: "Don't want these emails? Reply STOP.",
   letterTitle: "How is your home this month?",
-  letterIntro: "Once a month we check in to make sure your home is warm, dry and healthy. Tick anything that's true for you and send this back. There's no wrong answer, and you won't be blamed.",
+  letterIntro: "Every month we check your home is warm, dry and healthy. Tick anything that's true and post this back. There are no wrong answers. You won't be blamed.",
   // The tick boxes come from content.js (letterItems), so they match the reply form on the board.
-  letterEnd: "Send it back in the free envelope. No stamp needed. Or tell us online or by phone.",
-  letterStop: "Don't want these letters? Tick here and send it back: I'd rather not get these reminders.",
+  letterEnd: "Post it back in the free envelope. You don't need a stamp. Or tell us online or by phone.",
+  letterStop: "Don't want these letters? Write STOP on this page and post it back.",
 
   sendHeading: "Send this round",
   sendButton: "Send this month's reminders (prototype)",
