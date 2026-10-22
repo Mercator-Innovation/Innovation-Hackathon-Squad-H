@@ -9,10 +9,14 @@ ai_use_before: 4
 hopes: [see-claude, build-fast, other-jobs, new-people]
 feeling: excited
 # At 19:00
-worked_on: []
-outside_usual_job:
-got_in_way: []
-ai_use_after:
+worked_on: [code, design, content]
+outside_usual_job: a-lot
+got_in_way: [sharing, time]
+ai_use_after: 4
+enjoyed: loved
+pace: right
+worked_best: [building, mixed-squad, screen-badges, setup]
+again: definitely
 badges: [claude-master]
 # In the week after
 specialist:
@@ -58,10 +62,15 @@ ai_use_week_after:
 - 18:10 About the hackathon itself: the Tag team badge (three people sharing within 15 minutes) can't be earned by a squad of two. Worth changing for next time.
 
 ## At 19:00
-- What I worked on: <answers>
-- How much of it was outside my usual job: <answer>
-- What got in the way: <answers>
-- How much I'd use AI tools in my work now: <answer>
+- What I worked on: Code or features; The design or the look; The words people see
+- How much of it was outside my usual job: A lot
+- What got in the way: Sharing or git; Not enough time
+- How much I'd use AI tools in my work now: Every day
+- How much I enjoyed the hackathon: Loved it
+- The pace of the afternoon: About right
+- What worked best for me: Building with Claude; Working in a mixed squad; The shared screen and badges; The setup before the day
+- Would I take part in another: Definitely
+- One thing to change next time: maybe a bit longer for demos
 
 ## In the week after
 - Did I still need a human specialist: <answer>, for <what>
