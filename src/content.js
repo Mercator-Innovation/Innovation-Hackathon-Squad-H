@@ -64,7 +64,7 @@ window.CONTENT = {
     left: (n) => n === 0 ? "due today" : n + " working " + (n === 1 ? "day" : "days") + " left",
     late: (n) => n + " working " + (n === 1 ? "day" : "days") + " late",
     closed: "All steps done",
-    lateNote: "A deadline has passed. Tell the tenant why, and give them a new date. Keep stopping the damp or mould from spreading. The tenant may be owed compensation.",
+    lateNote: "A deadline has passed. Tell the tenant why, and give them a new date. Keep stopping the damp or mould from spreading.",
     markInvestigated: "Mark investigation done",
     substantialLegend: "Did the investigation find substantial damp or mould?",
     substantialYes: "Yes",
@@ -73,6 +73,9 @@ window.CONTENT = {
     markSummary: "Mark summary sent",
     markStarted: "Mark repairs started",
     markFinished: "Mark repairs finished",
+    undoStep: (label) => "Undo the last step (" + label.toLowerCase() + ")",
+    undone: (label) => label + ": undone, it was marked done by mistake",
+    compensation: (amount) => "If it stays late, the tenant may be owed about £" + amount + " so far: £15, then £3 for each extra working day, up to £100 a repair. This is our estimate, not legal advice.",
 
     // Recording a delay. Reasons and interim steps are the examples in the Scottish Government guidance.
     delayHeading: "Can't meet a deadline?",

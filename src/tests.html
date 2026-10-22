@@ -101,6 +101,25 @@
       const delayedDone = caseWith({ investigated: "2026-10-22", delays: { investigate: { newDate: "2026-12-01" } } });
       check("A delay on a step that's done doesn't reopen it", step(delayedDone, "investigate").open, false);
 
+      group("Compensation estimate");
+      const { compensationEstimate, lastDoneStep, undoStep } = window.Clock;
+      check("Not late: nothing owed", compensationEstimate(0), 0);
+      check("1 working day late: £15", compensationEstimate(1), 15);
+      check("2 working days late: £18 (£15, then £3 a day)", compensationEstimate(2), 18);
+      check("10 working days late: £42", compensationEstimate(10), 42);
+      check("40 working days late: capped at £100", compensationEstimate(40), 100);
+
+      group("Undoing a step");
+      check("Nothing done yet: nothing to undo", lastDoneStep(fresh), null);
+      check("After the investigation, the investigation is the step to undo", lastDoneStep(found), "investigate");
+      const sameDay = caseWith({ investigated: "2026-10-22", substantial: true, summarySent: "2026-10-22" });
+      check("Investigated and summary sent the same day: undo the summary first", lastDoneStep(sameDay), "summary");
+      check("Repairs started: undo the start first", lastDoneStep(started), "start");
+      const undone = undoStep(found, "investigate");
+      check("Undoing the investigation reopens it", step(undone, "investigate").open, true);
+      check("Undoing the investigation forgets what it found", undone.substantial, null);
+      check("Undoing doesn't change the original case", found.investigated, "2026-10-22");
+
       // Show the results.
       const all = groups.flatMap((g) => g.checks);
       const failed = all.filter((c) => !c.pass).length;

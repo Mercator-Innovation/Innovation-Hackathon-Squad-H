@@ -106,7 +106,7 @@
 
   // ---------- The Awaab's Law clock ----------
   // The deadline maths lives in clock.js, so it can be tested on its own (open tests.html).
-  const { addWorkingDays, startOfToday, toISO, fromISO, newCase, awaabSteps } = window.Clock;
+  const { addWorkingDays, startOfToday, toISO, fromISO, newCase, awaabSteps, lastDoneStep, undoStep, compensationEstimate } = window.Clock;
 
   // The most urgent open step, or null when the clock isn't running.
   function awaabStatus(id) {
@@ -134,6 +134,8 @@
   function renderAwaab(c) {
     const steps = awaabSteps(c);
     const anyLate = steps.some((s) => s.open && s.daysLeft < 0);
+    const mostLate = Math.min(0, ...steps.filter((s) => s.open).map((s) => s.daysLeft));
+    const last = lastDoneStep(c);
 
     const items = steps.map((s) => {
       const step = C.awaab.steps[s.key];
@@ -193,8 +195,10 @@
       "<h3>" + C.awaab.heading + "</h3>" +
       '<p class="note">' + C.awaab.intro + " " + C.awaab.aware(formatDate(fromISO(c.aware))) + "</p>" +
       '<ol class="clock-steps">' + items + "</ol>" +
-      (anyLate ? '<p class="warning">' + C.awaab.lateNote + "</p>" : "") +
+      (anyLate ? '<p class="warning">' + C.awaab.lateNote + " " + C.awaab.compensation(compensationEstimate(-mostLate)) + "</p>" : "") +
       (controls ? '<div id="awaab-controls">' + controls + "</div>" : '<p class="clock-done">' + C.awaab.closed + "</p>") +
+      (last ? '<p><button type="button" class="button secondary" id="awaab-undo" data-undo="' + last + '">' +
+        C.awaab.undoStep(C.awaab.steps[last].label) + "</button></p>" : "") +
       delayForm +
       "</div>";
   }
@@ -553,6 +557,22 @@
         if (step === "start") s.awaab.repairsStarted = todayISO;
         if (step === "finish") s.awaab.repairsFinished = todayISO;
         s.history.push({ label: C.awaab.steps[step].label + ": done", date: formatDate(startOfToday()) });
+        saveState();
+        renderList();
+        renderDetail(false);
+        const clock = document.getElementById("awaab-clock");
+        clock.setAttribute("tabindex", "-1");
+        clock.focus();
+      });
+    }
+
+    // Undoing a step marked done by mistake (the most recent one only, so the steps stay in order).
+    const undoStepButton = document.getElementById("awaab-undo");
+    if (undoStepButton) {
+      undoStepButton.addEventListener("click", () => {
+        const key = undoStepButton.dataset.undo;
+        s.awaab = undoStep(s.awaab, key);
+        s.history.push({ label: C.awaab.undone(C.awaab.steps[key].label), date: formatDate(startOfToday()) });
         saveState();
         renderList();
         renderDetail(false);
