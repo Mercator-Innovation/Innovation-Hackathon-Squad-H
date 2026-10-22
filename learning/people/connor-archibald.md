@@ -50,6 +50,11 @@ ai_use_week_after:
 - 17:39 dead end: Claude made mistakes too: a phone-layout bug from its own clock label, a clashing name in the code that would have broken the board, a test with a miscounted date, and sharing once before reading a warning → each was caught by checking (looking at the page, the tests, or a second look), not by trusting it.
 - 17:46 prompt: "we need better reminders for the officers to contact the people that have not been in contact themselves how could we do that?" → three options to choose from, then a contact ladder for tenants who've gone quiet (letter, then phone call, then a door knock), with nudges on the board and the manager summary. It goes straight at the challenge's hardest problem: tenants who never get in touch.
 - 17:51 surprise: Claude checked every helpline number on the service's own website before putting it on the tenant page, and wouldn't make up a repairs number for a made-up landlord.
+- 16:45 I chose the look of the whole site ("warm and friendly", picked from three options Claude described) and had all the officer, email and letter words rewritten in plain English, normally a designer's and a content designer's job: picking from options was quick, and every change was checked for contrast and accessibility before it was shared.
+- 18:10 Working as a squad of two: about 50 shares between us (31 mine, 19 Glory's) with no clashes at all. What made it easy: a clear split (me on the officer pages, Glory on the tenant pages), small shares every few minutes, new things in their own files, and "get the latest" before starting anything.
+- 18:06 Claude pushed back twice, and it was right to: it suggested an illustrated map instead of a real one, because made-up homes would have sat on real people's houses; and it wouldn't fake a third person's shares to earn the Tag team badge, suggesting we ask a facilitator instead.
+- 18:10 dead end: tooling hiccups. Browsers kept showing old versions until a hard refresh (Cmd+Shift+R), the local preview server sometimes dropped files when pages reloaded quickly, and twice a quick script gave a false alarm that looking at the page cleared up.
+- 18:10 About the hackathon itself: the Tag team badge (three people sharing within 15 minutes) can't be earned by a squad of two. Worth changing for next time.
 
 ## At 19:00
 - What I worked on: <answers>
