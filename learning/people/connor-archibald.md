@@ -19,10 +19,10 @@ worked_best: [building, mixed-squad, screen-badges, setup]
 again: definitely
 badges: [claude-master]
 # In the week after
-specialist:
-helped_squad: []
-idea_where: []
-ai_use_week_after:
+specialist: never
+helped_squad: [screen, explaining, small-shares, talking]
+idea_where: [internal, bid, client]
+ai_use_week_after: 4
 ---
 
 # Connor Archibald: learning log
@@ -73,11 +73,11 @@ ai_use_week_after:
 - One thing to change next time: maybe a bit longer for demos
 
 ## In the week after
-- Did I still need a human specialist: <answer>, for <what>
-- What helped most when building as a squad: <answers>
-- The most useful thing I learned: <in my words>
-- **One idea to carry forward:** <in my words>, and where it could fit: <answers>
-- How much I expect to use AI tools from now on: <answer>
+- Did I still need a human specialist: Never
+- What helped most when building as a squad: The shared screen; Claude explaining what it did; Small, frequent shares; Talking it through first
+- The most useful thing I learned: I think just learning what Claude is capable of even compared to the last hackathon.
+- **One idea to carry forward:** I already use AI a lot in my current work but I think maybe getting more people skilled up on it might be a good idea., and where it could fit: Internal work; A bid; Client work where the tools are permitted
+- How much I expect to use AI tools from now on: Every day
 
 ## Three-week check-in (around 12 Nov)
 - Did I try, share or suggest my idea anywhere? What happened, or what got in the way?
