@@ -23,6 +23,8 @@ specialist: never
 helped_squad: [screen, explaining, small-shares, talking]
 idea_where: [internal, bid, client]
 ai_use_week_after: 4
+# Three-week check-in
+idea_tried: blocked
 ---
 
 # Connor Archibald: learning log
@@ -79,5 +81,6 @@ ai_use_week_after: 4
 - **One idea to carry forward:** I already use AI a lot in my current work but I think maybe getting more people skilled up on it might be a good idea., and where it could fit: Internal work; A bid; Client work where the tools are permitted
 - How much I expect to use AI tools from now on: Every day
 
-## Three-week check-in (around 12 Nov)
-- Did I try, share or suggest my idea anywhere? What happened, or what got in the way?
+## Three-week check-in
+- Have I tried, shared or suggested my idea: Not yet, something got in the way
+- What happened, or what got in the way: project work
