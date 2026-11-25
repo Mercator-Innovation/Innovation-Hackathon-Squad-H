@@ -3,7 +3,7 @@
 10-minute slot: about 9 minutes presenting, then 1 minute for questions. Around 1,100 spoken words.
 Squad: Glory Eyo (delivery manager, product owner) and Connor Archibald (QA engineer, merge captain).
 Before you start: say `get the latest and make it run for me`, so the demo shows the squad's latest version.
-Slides, with the script for each slide in its speaker notes: https://claude.ai/artifact/W75qK6knL4ZJFEexeZZf9V (11 slides; the live demo is last, 7:30 to 9:00, then questions).
+Slides, with the script for each slide in its speaker notes: https://claude.ai/artifact/W75qK6knL4ZJFEexeZZf9V (11 slides; the demo is a recorded video on the last slide, 7:30 to 9:00, then questions). The video is also in `show-and-tell/demo.mp4`.
 
 > Note: Glory's week-after reflection and three-week check-in aren't in her log yet, so sections 7 and 8 lean on Connor's. Add Glory's words if she does them before 14:00.
 
